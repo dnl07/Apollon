@@ -1,0 +1,6 @@
+@Apollon_HostAddress = http://localhost:5073
+
+GET {{Apollon_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
