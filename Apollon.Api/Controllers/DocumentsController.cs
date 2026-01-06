@@ -1,4 +1,5 @@
-﻿using Apollon.Models;
+﻿using Apollon.Core.Documents;
+using Apollon.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Apollon.Controllers {
