@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollon.Core", "Apollon.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollon.Tests", "Apollon.Tests\Apollon.Tests.csproj", "{3BFEA7FE-A870-4486-9D94-AD9AE7E3DE55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollon.Models", "Apollon.Models\Apollon.Models.csproj", "{137C0F85-9FEA-43F4-A820-33E83F1C1259}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3BFEA7FE-A870-4486-9D94-AD9AE7E3DE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BFEA7FE-A870-4486-9D94-AD9AE7E3DE55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BFEA7FE-A870-4486-9D94-AD9AE7E3DE55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137C0F85-9FEA-43F4-A820-33E83F1C1259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137C0F85-9FEA-43F4-A820-33E83F1C1259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137C0F85-9FEA-43F4-A820-33E83F1C1259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137C0F85-9FEA-43F4-A820-33E83F1C1259}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

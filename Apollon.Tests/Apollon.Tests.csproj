@@ -16,4 +16,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Apollon.Core\Apollon.Core.csproj" />
+    <ProjectReference Include="..\Apollon.Models\Apollon.Models.csproj" />
+  </ItemGroup>
+
 </Project>

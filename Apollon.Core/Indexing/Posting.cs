@@ -1,5 +1,5 @@
 namespace Apollon.Core.Indexing {
-    internal class Posting {
+    public class Posting {
         public int DocumentId { get; }
         public int TermFrequency { get; set; }
         public double BM25Score { get; set; } = 0;

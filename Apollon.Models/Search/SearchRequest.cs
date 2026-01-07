@@ -1,6 +1,6 @@
-﻿namespace Apollon.Models {
+﻿namespace Apollon.Api.Models {
     public class SearchRequest {
         public string Query { get; set; } = "";
-        public int Limit { get; set; } = 100;
+        public int MaxDocs { get; set; } = 100;
     }
 }

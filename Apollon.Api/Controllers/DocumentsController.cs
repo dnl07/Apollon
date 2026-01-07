@@ -1,18 +1,24 @@
-﻿using Apollon.Core.Documents;
-using Apollon.Models;
+﻿using Apollon.Api.Models;
+using Apollon.Core.Documents;
+using Apollon.Core.Search;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Apollon.Controllers {
+namespace Apollon.Api.Controllers {
 
     [ApiController]
     [Route("documents")]
     public class DocumentsController : ControllerBase {
-        public static readonly List<SearchDocument> Documents = [];
+        private readonly SearchEngine _searchEngine;
+
+        public DocumentsController(SearchEngine searchEngine) {
+            _searchEngine = searchEngine; 
+        }
 
         [HttpPost]
-        public IActionResult Add([FromBody] SearchDocument document) {
-            Documents.Add(document);
-            return Ok(new { status = "indexed", document.Id });
+        public IActionResult<SearchResponse> Add([FromBody] SearchDocument document) {
+            _searchEngine.AddDocument(document);
+            
+            return Ok();
         }
     }
 }
