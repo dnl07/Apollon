@@ -6,6 +6,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.WebHost.ConfigureKestrel(options => {
+    options.Limits.MaxRequestBodySize = 100_000_000;
+});
+
 builder.Services.AddSingleton<ApollonCore>();
 
 builder.Services.AddSingleton(sp => {

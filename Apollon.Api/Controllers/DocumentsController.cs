@@ -1,10 +1,8 @@
-﻿using Apollon.Api.Models;
-using Apollon.Core.Documents;
+﻿using Apollon.Core.Documents;
 using Apollon.Core.Search;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Apollon.Api.Controllers {
-
     [ApiController]
     [Route("documents")]
     public class DocumentsController : ControllerBase {
@@ -15,10 +13,22 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpPost]
-        public IActionResult<SearchResponse> Add([FromBody] SearchDocument document) {
-            _searchEngine.AddDocument(document);
+        public IActionResult Add([FromBody] SearchDocument document) {
+            var doc = _searchEngine.AddDocument(document);
             
-            return Ok();
+            return Ok(new { status = "document added", id = doc.Id});
+        }
+
+        [HttpPost("bulk")]
+        public IActionResult AddBulk([FromBody] SearchDocument[] documents) {
+            Dictionary<Guid, string> ids = new Dictionary<Guid, string>();
+
+            foreach (var doc in documents) {
+                Guid id = _searchEngine.AddDocument(doc).Id;
+                ids[id] = doc.Title;
+            }
+
+            return Ok(new { status = "documents added", ids });
         }
     }
 }
