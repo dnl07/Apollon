@@ -21,5 +21,13 @@ namespace Apollon.Core.Indexing {
                 }
             }
         }
+
+        public IReadOnlyList<string> GetCandidates(string token) {
+            if (_nGramIndex.TryGetValue(token, out var candidates)) {  
+                return candidates; 
+            }
+
+            return [];
+        }
     }
 }

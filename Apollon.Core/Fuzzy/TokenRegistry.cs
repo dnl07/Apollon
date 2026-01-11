@@ -3,11 +3,14 @@
         private readonly Dictionary<Guid, string> _idToToken = new Dictionary<Guid, string>();
         private readonly Dictionary<string, Guid> _tokenToId = new Dictionary<string, Guid>();
 
-        public void Add(string token) {
-            Guid id = Guid.NewGuid();
+        public bool Add(string token) {
+            var id = Guid.NewGuid();
+            if (!_tokenToId.TryAdd(token, id)) {
+                return false;
+            }
 
             _idToToken[id] = token;
-            _tokenToId[token] = id;
+            return true;
         }
 
         public string GetToken(Guid id) {

@@ -4,21 +4,13 @@ namespace Apollon.Core.Indexing {
     internal class InvertedIndex {
         private readonly Dictionary<string, List<Posting>> _invertedIndex = new();
 
-        public void AddDocument(SearchDocument doc) {
-            string[] tokens = DocumentUtils.GetTokensOfDocument(doc);
-            
+        public void AddDocument(SearchDocument doc, HashSet<string> tokens) {            
             foreach (string token in tokens) {
-                if (_invertedIndex.TryGetValue(token, out var postings)) {
-                    int index = postings.FindIndex(p => p.DocumentId == doc.Id);
-
-                    if (index == -1) {
-                        postings.Add(new Posting(doc.Id, 1));
-                    } else {
-                        postings[index].TermFrequency++;
-                    }
-                } else {
-                    _invertedIndex[token] = [new Posting(doc.Id, 1)];
-                }
+                if (!_invertedIndex.TryGetValue(token, out var postings)) {
+                    postings = new List<Posting>();
+                    _invertedIndex[token] = postings;
+                } 
+                postings.Add(new Posting(doc.Id, 1));
             }
         }
 

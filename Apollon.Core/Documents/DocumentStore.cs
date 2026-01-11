@@ -2,14 +2,12 @@ namespace Apollon.Core.Documents {
     internal class DocumentStore {
         private readonly Dictionary<Guid, SearchDocument> _docs = new();
 
+        private int _totalDocs;
+
         public void Add(SearchDocument doc) {
             _docs[doc.Id] = doc;
-
-            int sum = 0;
-            foreach (var id in _docs.Keys) {
-               sum += GetLength(id);
-            }
-            AverageDocumentLength = (double)sum / _docs.Count;
+            _totalDocs++;
+            AverageDocumentLength = (double)_totalDocs / _docs.Count;
         }
 
         public SearchDocument Get(Guid id) {

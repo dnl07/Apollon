@@ -1,7 +1,6 @@
-﻿using Apollon.Api.Models;
-using Apollon.Core.Documents;
-using Apollon.Core.Indexing;
-using Apollon.Core.Search;
+﻿using Apollon.Core.Search;
+using Apollon.Models.Api;
+using Apollon.Models.Search;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Apollon.Api.Controllers {
@@ -15,13 +14,13 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpPost]
-        public ActionResult<SearchResponse> Search([FromBody] SearchRequest request) {
-            List<SearchDocument> documents = _searchEngine.Search(request.Query, request.MaxDocs);
+        public ActionResult<SearchResult> Search([FromBody] SearchRequest request) {
+            SearchResult searchResult = _searchEngine.Search(request.Query, request.MaxDocs);
 
             return Ok(
                 new {
                     query = request.Query,
-                    message = documents
+                    message = searchResult
                 });
         }
     }
