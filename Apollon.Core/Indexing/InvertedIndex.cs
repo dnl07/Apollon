@@ -1,4 +1,3 @@
-using Apollon.Core.Analysis;
 using Apollon.Core.Documents;
 
 namespace Apollon.Core.Indexing {
@@ -6,10 +5,7 @@ namespace Apollon.Core.Indexing {
         private readonly Dictionary<string, List<Posting>> _invertedIndex = new();
 
         public void AddDocument(SearchDocument doc) {
-            string[] tokens = Tokenizer.Tokenize(doc.Title)
-                .Concat(Tokenizer.Tokenize(doc.Text))
-                .Concat(doc.Tags)
-                .ToArray();
+            string[] tokens = DocumentUtils.GetTokensOfDocument(doc);
             
             foreach (string token in tokens) {
                 if (_invertedIndex.TryGetValue(token, out var postings)) {

@@ -5,12 +5,17 @@ using Apollon.Core.Options;
 
 namespace Apollon.Core.Search {
     public class SearchEngine {
-        private readonly DocumentStore _docs = new();
-        private readonly InvertedIndex _invertedIndex = new();
         private readonly SearchOptions _options;
+
+        private readonly DocumentStore _docs = new();
+        private readonly TokenRegistry _tokens = new();
+
+        private readonly InvertedIndex _invertedIndex = new();
+        private readonly NGramIndex _nGramIndex = null!;
 
         public SearchEngine(SearchOptions? options = null) {
             _options = options == null ? new SearchOptions() : options;
+            _nGramIndex = new NGramIndex(_options.NGramsSize);
         }
 
         public SearchDocument AddDocument(SearchDocument doc) {
@@ -18,6 +23,13 @@ namespace Apollon.Core.Search {
 
             _docs.Add(doc);
             _invertedIndex.AddDocument(doc);
+
+            var tokens = DocumentUtils.GetTokensOfDocument(doc);
+
+            foreach (string token in tokens) {
+                _tokens.Add(token);
+                _nGramIndex.AddToken(token);
+            }
 
             return doc;
         }
