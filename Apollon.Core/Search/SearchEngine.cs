@@ -7,12 +7,16 @@ namespace Apollon.Core.Search {
         private readonly DocumentStore _docs = new();
         private readonly InvertedIndex _invertedIndex = new();
 
-        public void AddDocument(SearchDocument doc) {
+        public SearchDocument AddDocument(SearchDocument doc) {
+            doc.Id = Guid.NewGuid();
+
             _docs.Add(doc);
             _invertedIndex.AddDocument(doc);
+
+            return doc;
         }
 
-        public List<Posting> Search(string request) {
+        public List<SearchDocument> Search(string request, int maxDocs) {
             string[] terms = Tokenizer.Tokenize(request);
 
             if (terms.Length == 0) return [];
@@ -30,8 +34,11 @@ namespace Apollon.Core.Search {
             for (int i = 1; i < lists.Count; i++) {
                 merged = SearchUtils.MergePostingsLists(merged, lists[i]);
             }
-
-            return merged.OrderBy(m => m.BM25Score).ToList();
+            return merged.
+                OrderBy(m => m.BM25Score)
+                .Select(d => _docs.Get(d.DocumentId))
+                .Take(maxDocs)
+                .ToList();
         }
     }
 }

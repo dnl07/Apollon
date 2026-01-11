@@ -1,0 +1,7 @@
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json; charset=utf-8
+Date: Thu, 08 Jan 2026 19:30:18 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"$":["'e' is invalid within a number, immediately after a sign character ('+' or '-'). Expected a digit ('0'-'9'). Path: $ | LineNumber: 0 | BytePositionInLine: 1."],"document":["The document field is required."]},"traceId":"00-26210ace35f141d4c189f9b1d1440361-6e39be8801c723d9-00"}

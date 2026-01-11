@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Doc1",
+    "text": "Text1",
+    "tags": [ "a" ]
+  },
+  {
+    "title": "Doc2",
+    "text": "Text2",
+    "tags": [ "b" ]
+  }
+]
