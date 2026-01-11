@@ -1,11 +1,17 @@
 using Apollon.Core.Analysis;
 using Apollon.Core.Documents;
 using Apollon.Core.Indexing;
+using Apollon.Core.Options;
 
 namespace Apollon.Core.Search {
     public class SearchEngine {
         private readonly DocumentStore _docs = new();
         private readonly InvertedIndex _invertedIndex = new();
+        private readonly SearchOptions _options;
+
+        public SearchEngine(SearchOptions? options = null) {
+            _options = options == null ? new SearchOptions() : options;
+        }
 
         public SearchDocument AddDocument(SearchDocument doc) {
             doc.Id = Guid.NewGuid();
