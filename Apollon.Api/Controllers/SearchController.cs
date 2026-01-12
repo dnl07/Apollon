@@ -15,13 +15,9 @@ namespace Apollon.Api.Controllers {
 
         [HttpPost]
         public ActionResult<SearchResult> Search([FromBody] SearchRequest request) {
-            SearchResult searchResult = _searchEngine.Search(request.Query, request.MaxDocs);
-
-            return Ok(
-                new {
-                    query = request.Query,
-                    message = searchResult
-                });
+            SearchResult searchResult = _searchEngine.Search(request.Query, request.Options);
+            
+            return Ok(searchResult);
         }
     }
 }
