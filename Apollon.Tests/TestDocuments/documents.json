@@ -1,12 +1,27 @@
 [
   {
-    "title": "Doc1",
-    "text": "Text1",
-    "tags": [ "a" ]
+    "title": "Einführung in Apollon",
+    "text": "Apollon ist eine schnelle Suchmaschine für .NET mit Fuzzy Search.",
+    "tags": [ "search", "dotnet", "fuzzy" ]
   },
   {
-    "title": "Doc2",
-    "text": "Text2",
-    "tags": [ "b" ]
+    "title": "Fuzzy Suche erklärt",
+    "text": "Fuzzy Search erlaubt Tippfehler wie apllon oder apolon zu finden.",
+    "tags": [ "search", "fuzzy" ]
+  },
+  {
+    "title": "BM25 Ranking",
+    "text": "BM25 ist ein Ranking Algorithmus für Volltext Suchmaschinen.",
+    "tags": [ "ranking", "bm25" ]
+  },
+  {
+    "title": "N-Gram Index",
+    "text": "Ein N Gram Index beschleunigt Fuzzy Matching erheblich.",
+    "tags": [ "ngram", "index" ]
+  },
+  {
+    "title": "ASP.NET Web API",
+    "text": "ASP.NET Core eignet sich gut für Such APIs.",
+    "tags": [ "dotnet", "api" ]
   }
 ]
