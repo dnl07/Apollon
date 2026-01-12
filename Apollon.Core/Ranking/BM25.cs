@@ -1,5 +1,5 @@
 namespace Apollon.Core.Ranking {
-    internal static class BM25 {
+    public static class BM25 {
         /// <summary>
         /// Computes the BM25 for a given posting.
         /// </summary>

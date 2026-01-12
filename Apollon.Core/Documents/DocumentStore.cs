@@ -1,5 +1,5 @@
 namespace Apollon.Core.Documents {
-    internal class DocumentStore {
+    public class DocumentStore {
         private readonly Dictionary<Guid, SearchDocument> _docs = new();
 
         private int _totalDocs;

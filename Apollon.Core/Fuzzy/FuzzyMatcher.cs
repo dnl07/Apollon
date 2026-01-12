@@ -5,17 +5,17 @@ using Apollon.Core.Options;
 namespace Apollon.Core.Fuzzy {
     internal class FuzzyMatcher {
         private readonly NGramIndex _nGramIndex;
-        private readonly SearchOptions _options;
+        private readonly IndexOptions _indexOptions;
 
-        public FuzzyMatcher(NGramIndex nGramIndex, SearchOptions options) {
+        public FuzzyMatcher(NGramIndex nGramIndex, IndexOptions options) {
             _nGramIndex = nGramIndex;
-            _options = options;
+            _indexOptions = options;
         }
 
-        public IReadOnlyList<FuzzyToken> Match(string token) {
+        public IReadOnlyList<FuzzyToken> Match(string token, QueryOptions queryOptions) {
             var candidates = new HashSet<string>();
 
-            foreach (var nGram in NGramGenerator.Generate(token, _options.NGramsSize)) {
+            foreach (var nGram in NGramGenerator.Generate(token, _indexOptions.NGramSize)) {
                 foreach (var candidate in _nGramIndex.GetCandidates(nGram)) {
                     candidates.Add(candidate);
                 }
@@ -25,7 +25,7 @@ namespace Apollon.Core.Fuzzy {
 
             foreach (var candidate in candidates) {
                 var editDistance = EditDistance.Calculate(token, candidate);
-                if (editDistance <= _options.MaxEditDistance) {
+                if (editDistance <= queryOptions.MaxEditDistance) {
                     tokens.Add(new FuzzyToken(token, editDistance));
                 }    
             }
