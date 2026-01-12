@@ -26,7 +26,7 @@ namespace Apollon.Core.Fuzzy {
             foreach (var candidate in candidates) {
                 var editDistance = EditDistance.Calculate(token, candidate);
                 if (editDistance <= queryOptions.MaxEditDistance) {
-                    tokens.Add(new FuzzyToken(token, editDistance));
+                    tokens.Add(new FuzzyToken(candidate, editDistance));
                 }    
             }
 

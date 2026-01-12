@@ -5,7 +5,7 @@ namespace Apollon.Core.Analysis {
 
             // Remove stopwords
             if (stopWords != null) {
-                _ = tokens.Select(stopWords.Contains);
+                _ = tokens.Select(t => !stopWords.Contains(t));
             }
 
             return tokens;

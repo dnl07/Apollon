@@ -4,32 +4,41 @@ using Apollon.Core.Fuzzy;
 using Apollon.Core.Indexing;
 using Apollon.Core.Options;
 using Apollon.Models.Search;
-using System.Diagnostics;
 
 namespace Apollon.Core.Search {
     public class SearchEngine {
-        private readonly IndexOptions _options;
+        private IndexOptions _options = new();
+        private bool _initialized = false;
 
         private readonly DocumentStore _docs = new();
         private readonly TokenRegistry _tokens = new();
 
         private readonly InvertedIndex _invertedIndex = new();
-        private readonly NGramIndex _nGramIndex = null!;
+        private NGramIndex _nGramIndex = null!;
 
-        private readonly FuzzyMatcher _fuzzyMatcher = null!;
-
-        private int _counter = 0;
-
-        public SearchEngine(IndexOptions? options = null) {
-            _options = options == null ? new IndexOptions() : options;
-            _nGramIndex = new NGramIndex(_options.NGramSize);
-            _fuzzyMatcher = new FuzzyMatcher(_nGramIndex, _options);
-        }
+        private FuzzyMatcher _fuzzyMatcher = null!;
 
         public void Initialize(IndexOptions options) {
+            if (_initialized) {
+                throw new InvalidOperationException("SearchEngine is already initialized.");
+            }
+
+            _options = options;
+            _nGramIndex = new NGramIndex(_options.NGramSize);
+            _fuzzyMatcher = new FuzzyMatcher(_nGramIndex, _options);
+
+            _initialized = true;
+        }
+
+        private void EnsureInitialized() {
+            if (!_initialized) {
+                throw new InvalidOperationException("SearchEngine is not initialized.");
+            }
         }
 
         public SearchDocument AddDocument(SearchDocument doc) {
+            EnsureInitialized();
+
             doc.Id = Guid.NewGuid();
 
             var tokens = DocumentUtils.GetTokensOfDocument(doc, _options.StopWords);
@@ -42,15 +51,12 @@ namespace Apollon.Core.Search {
                     _nGramIndex.AddToken(token);
                 }
             }
-
-            if (_counter % 1000 == 0) Debug.WriteLine(_counter);
-
-            _counter++;
-
             return doc;
         }
 
         public SearchResult Search(string request, QueryOptions options) {
+            EnsureInitialized();
+
             var result = new SearchResult();
             result.Query = request;
 
@@ -71,23 +77,26 @@ namespace Apollon.Core.Search {
 
             if (expanded.Count == 0) return result;
 
-            var lists = expanded
-                .Select(t => _invertedIndex.GetSortedPostings(t.term))
-                .Where(l => l.Count > 0)
-                .OrderBy(l => l.Count)
-                .ToList();
+            List<List<Posting>> invertedLists = new();
+            foreach ((string term, double boost) in expanded) {
+                var postings = _invertedIndex.GetSortedPostings(term);
 
-            foreach (var list in lists) {
-                SearchUtils.ComputeBM25Scores(list, _docs);
+                foreach (var posting in postings) {
+                    posting.Score = SearchUtils.ComputeBM25Score(posting, postings.Count, _docs);
+                    posting.Score *= boost;
+                }
+
+                invertedLists.Add(postings);
             }
+            invertedLists = invertedLists.OrderBy(l => l.Count).ToList();
 
-            var merged = lists[0];
-            for (int i = 1; i < lists.Count; i++) {
-                merged = SearchUtils.MergePostingsLists(merged, lists[i]);
+            var merged = invertedLists[0];
+            for (int i = 1; i < invertedLists.Count; i++) {
+                merged = SearchUtils.MergePostingsLists(merged, invertedLists[i]);
             }
 
             result.Documents = merged.
-                OrderBy(m => m.BM25Score)
+                OrderBy(m => m.Score)
                 .Select(d => _docs.Get(d.DocumentId))
                 .Take(options.MaxDocs)
                 .ToList();

@@ -13,7 +13,7 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpPost("init")]
-        public IActionResult Add([FromBody] IndexOptions options) {     
+        public IActionResult Add([FromBody] IndexOptions options) {
             _searchEngine.Initialize(options);
             return Ok(new { status = "options changed" });
         }

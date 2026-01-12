@@ -7,17 +7,14 @@ namespace Apollon.Core.Search {
         /// <summary>
         /// Calculates the BM25-Score for every posting in a list given all documents.
         /// </summary>
-        public static void ComputeBM25Scores(List<Posting> postings, DocumentStore docs) {
+        public static double ComputeBM25Score(Posting posting, int df, DocumentStore docs) {
             int n = docs.Count;
             double avdl = docs.AverageDocumentLength;
 
-            foreach (var posting in postings) {
-                var tf = posting.TermFrequency;
-                var df = postings.Count;
-                var dl = docs.GetLength(posting.DocumentId);
+            var tf = posting.TermFrequency;
+            var dl = docs.GetLength(posting.DocumentId);
 
-                posting.BM25Score = BM25.ComputeScore(tf, df, n, dl, avdl, SearchConstants.K, SearchConstants.B);
-            }
+            return BM25.ComputeScore(tf, df, n, dl, avdl, SearchConstants.K, SearchConstants.B);
         }
 
         /// <summary>
@@ -27,6 +24,9 @@ namespace Apollon.Core.Search {
         /// <param name="b"></param>
         /// <returns></returns>
         public static List<Posting> MergePostingsLists(List<Posting> a, List<Posting> b) {
+            if (a.Count == 0) return [..b];
+            if (b.Count == 0) return [..a];
+
             List<Posting> result = [];
 
             int i = 0;
@@ -34,14 +34,15 @@ namespace Apollon.Core.Search {
 
             while (i < a.Count && j < b.Count) {
                 if (a[i].DocumentId == b[j].DocumentId) {
-                    a[i].BM25Score += b[j].BM25Score;
+                    a[i].Score += b[j].Score;
                     result.Add(a[i]);
                     i++;
-                } else if (a[i].DocumentId < b[j].DocumentId) {
+                    j++;
+                } else if (a[i].DocumentId.CompareTo(b[j].DocumentId) < 0) {
                     result.Add(a[i]);
                     i++;
                 } else {
-                    result.Add(b[i]);
+                    result.Add(b[j]);
                     j++;
                 }
             }
