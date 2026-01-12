@@ -3,7 +3,10 @@ using Apollon.Core.Indexing;
 using Apollon.Core.Ranking;
 
 namespace Apollon.Core.Search {
-    internal static class SearchUtils {
+    public static class SearchUtils {
+        /// <summary>
+        /// Calculates the BM25-Score for every posting in a list given all documents.
+        /// </summary>
         public static void ComputeBM25Scores(List<Posting> postings, DocumentStore docs) {
             int n = docs.Count;
             double avdl = docs.AverageDocumentLength;
@@ -17,6 +20,12 @@ namespace Apollon.Core.Search {
             }
         }
 
+        /// <summary>
+        /// Merges two already sorted lists of postings.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static List<Posting> MergePostingsLists(List<Posting> a, List<Posting> b) {
             List<Posting> result = [];
 
