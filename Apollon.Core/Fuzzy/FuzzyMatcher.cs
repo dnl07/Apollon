@@ -1,9 +1,10 @@
 ﻿using Apollon.Core.Analysis;
+using Apollon.Core.Documents;
 using Apollon.Core.Indexing;
 using Apollon.Core.Options;
 
 namespace Apollon.Core.Fuzzy {
-    internal class FuzzyMatcher {
+    public class FuzzyMatcher {
         private readonly NGramIndex _nGramIndex;
         private readonly IndexOptions _indexOptions;
 
@@ -12,18 +13,18 @@ namespace Apollon.Core.Fuzzy {
             _indexOptions = options;
         }
 
-        public IReadOnlyList<FuzzyToken> Match(string token, QueryOptions queryOptions) {
-            var candidates = new HashSet<string>();
+        public IReadOnlyList<FuzzyToken> Match(string token, TokenRegistry tokenRegistry, QueryOptions queryOptions) {
+            var candidates = new HashSet<int>();
 
             foreach (var nGram in NGramGenerator.Generate(token, _indexOptions.NGramSize)) {
-                foreach (var candidate in _nGramIndex.GetCandidates(nGram)) {
-                    candidates.Add(candidate);
-                }
+                candidates = candidates.Concat(_nGramIndex.GetCandidates(nGram)).ToHashSet();
             }
 
             List<FuzzyToken> tokens = new List<FuzzyToken>();
 
-            foreach (var candidate in candidates) {
+            foreach (var id in candidates) {
+                string candidate = tokenRegistry.GetToken(id);
+
                 var editDistance = EditDistance.Calculate(token, candidate);
                 if (editDistance <= queryOptions.MaxEditDistance) {
                     tokens.Add(new FuzzyToken(candidate, editDistance));

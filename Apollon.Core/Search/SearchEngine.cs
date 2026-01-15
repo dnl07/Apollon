@@ -1,4 +1,3 @@
-using Apollon.Core.Analysis;
 using Apollon.Core.Documents;
 using Apollon.Core.Fuzzy;
 using Apollon.Core.Indexing;
@@ -47,10 +46,13 @@ namespace Apollon.Core.Search {
             _invertedIndex.AddDocument(doc, tokens);
 
             foreach (string token in tokens) {
-                if (_tokens.Add(token)) {
-                    _nGramIndex.AddToken(token);
+                var id = _tokens.Add(token);
+
+                if (id != -1) {
+                    _nGramIndex.AddToken(token, id);
                 }
             }
+
             return doc;
         }
 
@@ -61,44 +63,14 @@ namespace Apollon.Core.Search {
             result.Query = request;
 
             // fuzzy string matching
-            var expanded = new List<(string term, double boost)>();
+            var expanded = SearchUtils.FuzzySearch(request, _fuzzyMatcher, _tokens, options);
+            // inverted Lists
+            Dictionary<Guid, double> scores = SearchUtils.CreateScores(expanded, _invertedIndex, _docs);
 
-            foreach (string term in Tokenizer.Tokenize(request)) {
-                expanded.Add((term, 1.0));
-                result.UsedTokens.Add(term);
-
-                foreach (var fuzzy in _fuzzyMatcher.Match(term, options)) {
-                    double boost = Math.Exp(-fuzzy.EditDistance);
-                    expanded.Add((fuzzy.Token, boost));
-
-                    result.UsedTokens.Add(fuzzy.Token);
-                }
-            }
-
-            if (expanded.Count == 0) return result;
-
-            List<List<Posting>> invertedLists = new();
-            foreach ((string term, double boost) in expanded) {
-                var postings = _invertedIndex.GetSortedPostings(term);
-
-                foreach (var posting in postings) {
-                    posting.Score = SearchUtils.ComputeBM25Score(posting, postings.Count, _docs);
-                    posting.Score *= boost;
-                }
-
-                invertedLists.Add(postings);
-            }
-            invertedLists = invertedLists.OrderBy(l => l.Count).ToList();
-
-            var merged = invertedLists[0];
-            for (int i = 1; i < invertedLists.Count; i++) {
-                merged = SearchUtils.MergePostingsLists(merged, invertedLists[i]);
-            }
-
-            result.Documents = merged.
-                OrderBy(m => m.Score)
-                .Select(d => _docs.Get(d.DocumentId))
+            result.Documents = scores.
+                OrderByDescending(d => d.Value)
                 .Take(options.MaxDocs)
+                .Select(d => _docs.Get(d.Key))
                 .ToList();
 
             return result;

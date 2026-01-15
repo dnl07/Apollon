@@ -1,7 +1,7 @@
 using Apollon.Core.Documents;
 
 namespace Apollon.Core.Indexing {
-    internal class InvertedIndex {
+    public class InvertedIndex {
         private readonly Dictionary<string, List<Posting>> _invertedIndex = new();
 
         public void AddDocument(SearchDocument doc, HashSet<string> tokens) {            

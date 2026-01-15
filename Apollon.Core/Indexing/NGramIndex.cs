@@ -1,8 +1,8 @@
 using Apollon.Core.Analysis;
 
 namespace Apollon.Core.Indexing {
-    internal class NGramIndex {
-        private readonly Dictionary<string, List<string>> _nGramIndex = new();
+    public class NGramIndex {
+        private readonly Dictionary<string, HashSet<int>> _nGramIndex = new();
 
         private int _nGramSize { get; }
 
@@ -10,23 +10,20 @@ namespace Apollon.Core.Indexing {
             _nGramSize= nGramSize;
         }
 
-        public void AddToken(string token) {
+        public void AddToken(string token, int id) {
             foreach (var nGram in NGramGenerator.Generate(token, _nGramSize)) {
-                if (_nGramIndex.TryGetValue(nGram, out var tokens)) {
-                    if (!tokens.Contains(token)) {
-                        tokens.Add(token);
-                    }
+                if (_nGramIndex.TryGetValue(nGram, out var tokenIds)) {
+                    tokenIds.Add(id);
                 } else {
-                    _nGramIndex[nGram] = [token];
+                    _nGramIndex[nGram] = [id];
                 }
             }
         }
 
-        public IReadOnlyList<string> GetCandidates(string token) {
-            if (_nGramIndex.TryGetValue(token, out var candidates)) {  
-                return candidates; 
+        public HashSet<int> GetCandidates(string nGram) {
+            if (_nGramIndex.TryGetValue(nGram, out var candidates)) {  
+                return candidates ?? []; 
             }
-
             return [];
         }
     }

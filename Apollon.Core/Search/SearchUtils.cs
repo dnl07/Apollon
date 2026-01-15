@@ -1,5 +1,8 @@
-﻿using Apollon.Core.Documents;
+﻿using Apollon.Core.Analysis;
+using Apollon.Core.Documents;
+using Apollon.Core.Fuzzy;
 using Apollon.Core.Indexing;
+using Apollon.Core.Options;
 using Apollon.Core.Ranking;
 
 namespace Apollon.Core.Search {
@@ -17,47 +20,48 @@ namespace Apollon.Core.Search {
             return BM25.ComputeScore(tf, df, n, dl, avdl, SearchConstants.K, SearchConstants.B);
         }
 
-        /// <summary>
-        /// Merges two already sorted lists of postings.
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static List<Posting> MergePostingsLists(List<Posting> a, List<Posting> b) {
-            if (a.Count == 0) return [..b];
-            if (b.Count == 0) return [..a];
+        public static List<(string token, double boost)> FuzzySearch(
+            string request, 
+            FuzzyMatcher fuzzyMatcher,
+            TokenRegistry tokenRegistry,
+            QueryOptions options) {
+            var expanded = new List<(string term, double boost)>();
 
-            List<Posting> result = [];
+            foreach (string term in Tokenizer.Tokenize(request)) {
+                expanded.Add((term, 1.0));
 
-            int i = 0;
-            int j = 0;
-
-            while (i < a.Count && j < b.Count) {
-                if (a[i].DocumentId == b[j].DocumentId) {
-                    a[i].Score += b[j].Score;
-                    result.Add(a[i]);
-                    i++;
-                    j++;
-                } else if (a[i].DocumentId.CompareTo(b[j].DocumentId) < 0) {
-                    result.Add(a[i]);
-                    i++;
-                } else {
-                    result.Add(b[j]);
-                    j++;
+                foreach (var fuzzy in fuzzyMatcher.Match(term, tokenRegistry, options)) {
+                    double boost = Math.Exp(-fuzzy.EditDistance);
+                    expanded.Add((fuzzy.Token, boost));
                 }
             }
+            return expanded;
+        }
 
-            while (i < a.Count) {
-                result.Add(a[i]);
-                i++;
+        public static Dictionary<Guid, double> CreateScores(
+            List<(string token, double boost)> expanded, 
+            InvertedIndex _invertedIndex,
+            DocumentStore docs) {
+
+            var scores = new Dictionary<Guid, double>();
+
+            foreach ((string term, double boost) in expanded) {
+                var postings = _invertedIndex.GetSortedPostings(term);
+                int df = postings.Count;
+
+                foreach (var posting in postings) {
+                    double bm25 = ComputeBM25Score(posting, df, docs);
+                    
+                    double finalScore = bm25 * boost;
+
+                    if (scores.TryGetValue(posting.DocumentId, out var currentScore)) {
+                        scores[posting.DocumentId] = currentScore + finalScore;
+                    } else {
+                        scores[posting.DocumentId] = finalScore;
+                    }
+                }
             }
-
-            while (j < b.Count) {
-                result.Add(b[j]);
-                j++;
-            }
-
-            return result;
+            return scores;
         }
     }
 }
