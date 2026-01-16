@@ -36,16 +36,25 @@ namespace Apollon.Core.Search {
         }
 
         public SearchDocument AddDocument(SearchDocument doc) {
-            EnsureInitialized();
+            if (!_initialized) {
+                Initialize(new IndexOptions());
+                _initialized = true;
+            }
 
             doc.Id = Guid.NewGuid();
 
-            var tokens = DocumentUtils.GetTokensOfDocument(doc, _options.StopWords);
+            var titleTokens = DocumentUtils.GetTokensOfDocumentField(doc, Field.Title, _options.StopWords);
+            var descTokens = DocumentUtils.GetTokensOfDocumentField(doc, Field.Description, _options.StopWords);
+            var tagTokens = DocumentUtils.GetTokensOfDocumentField(doc, Field.Tags, _options.StopWords);
 
             _docs.Add(doc);
-            _invertedIndex.AddDocument(doc, tokens);
+            _invertedIndex.AddDocument(doc, titleTokens, descTokens, tagTokens);
 
-            foreach (string token in tokens) {
+            var allTokens = new HashSet<string>((titleTokens));
+            allTokens.UnionWith(descTokens);
+            allTokens.UnionWith(tagTokens);
+
+            foreach (string token in allTokens) {
                 var id = _tokens.Add(token);
 
                 if (id != -1) {
@@ -64,8 +73,11 @@ namespace Apollon.Core.Search {
 
             // fuzzy string matching
             var expanded = SearchUtils.FuzzySearch(request, _fuzzyMatcher, _tokens, options);
-            // inverted Lists
-            Dictionary<Guid, double> scores = SearchUtils.CreateScores(expanded, _invertedIndex, _docs);
+
+            result.UsedTokens = expanded.Select(e => e.token).ToList();
+
+            // creates scores
+            Dictionary<Guid, double> scores = SearchUtils.CreateScores(expanded, _invertedIndex, _docs, options);
 
             result.Documents = scores.
                 OrderByDescending(d => d.Value)

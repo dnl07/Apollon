@@ -15,12 +15,20 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpPost]
-        public ActionResult<SearchResult> Search([FromBody] SearchRequest request) {
+        public ActionResult<SearchResponse> Search([FromBody] SearchRequest request) {
             var watch = new Stopwatch();
+            watch.Start();
             SearchResult searchResult = _searchEngine.Search(request.Query, request.Options);
             watch.Stop();
-            Debug.WriteLine($"Search took {watch.ElapsedMilliseconds}ms");
-            return Ok(searchResult);
+            
+            var searchResponse = new SearchResponse();
+             
+            searchResponse.Query = searchResult.Query;
+            searchResponse.UsedTokes = searchResult.UsedTokens;
+            searchResponse.Docs = searchResult.Documents;
+            searchResponse.ElapsedTime = watch.ElapsedMilliseconds;
+
+            return Ok(searchResponse);
         }
     }
 }

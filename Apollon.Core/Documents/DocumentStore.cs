@@ -1,3 +1,5 @@
+using Apollon.Core.Indexing;
+
 namespace Apollon.Core.Documents {
     public class DocumentStore {
         private readonly Dictionary<Guid, SearchDocument> _docs = new();
@@ -14,9 +16,15 @@ namespace Apollon.Core.Documents {
             return _docs[id];
         }
 
-        public int GetLength(Guid id) {
+        public int GetLength(Guid id, Field field) {
             var d = _docs[id];
-            return d.Title.Length + d.Text.Length + d.Tags.Length;
+
+            return field switch {
+                Field.Title => d.Title.Length,
+                Field.Description => d.Description.Length,
+                Field.Tags => d.Tags.Length,
+                _ => 0,
+            };
         }
 
         public int Count => _docs.Count;

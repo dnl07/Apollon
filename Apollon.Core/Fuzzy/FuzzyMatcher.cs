@@ -20,6 +20,8 @@ namespace Apollon.Core.Fuzzy {
                 foreach (var candidateId in _nGramIndex.GetCandidates(nGram)) {
                     var candidate = tokenRegistry.GetToken(candidateId);
 
+                    if (candidate == token) continue;
+
                     if (candidates.TryGetValue(candidate, out var count)) {
                         candidates[candidate] = count + 1;
                     } else {
@@ -29,7 +31,6 @@ namespace Apollon.Core.Fuzzy {
             }
 
             List<FuzzyToken> tokens = new List<FuzzyToken>();
-
 
             var cand = new List<string>();
             foreach ((string key, int c) in candidates) {

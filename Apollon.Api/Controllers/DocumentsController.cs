@@ -1,5 +1,6 @@
 ﻿using Apollon.Core.Documents;
 using Apollon.Core.Search;
+using Apollon.Models.Api;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -14,27 +15,30 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpPost]
-        public IActionResult Add([FromBody] SearchDocument document) {
+        public ActionResult<DocumentResponse> Add([FromBody] SearchDocument document) {
             var doc = _searchEngine.AddDocument(document);
-            
-            return Ok(new { status = "document added", id = doc.Id});
+
+            var response = new DocumentResponse();
+            response.Documents = [doc.Title];
+
+            return Ok(new { status = "document added", response});
         }
 
         [HttpPost("bulk")]
-        public IActionResult AddBulk([FromBody] SearchDocument[] documents) {
+        public ActionResult<DocumentResponse> AddBulk([FromBody] SearchDocument[] documents) {
+            var response = new DocumentResponse();
             var watch = new Stopwatch();
-            watch.Start();
-            Dictionary<Guid, string> ids = new Dictionary<Guid, string>();
 
+            watch.Start();
             foreach (var doc in documents) {
                 Guid id = _searchEngine.AddDocument(doc).Id;
-                ids[id] = doc.Title;
+                response.Documents.Add(id.ToString());
             }
-
             watch.Stop();
-            Debug.WriteLine($"Added Documents in {watch.ElapsedMilliseconds}ms");
 
-            return Ok(new { status = "SUCCESS", ids });
+            response.ElapsedTime = watch.ElapsedMilliseconds;
+
+            return Ok(new { status = $"{response.Documents.Count} documents added!", response });
         }
     }
 }

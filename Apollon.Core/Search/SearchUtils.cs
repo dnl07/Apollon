@@ -10,14 +10,14 @@ namespace Apollon.Core.Search {
         /// <summary>
         /// Calculates the BM25-Score for every posting in a list given all documents.
         /// </summary>
-        public static double ComputeBM25Score(Posting posting, int df, DocumentStore docs) {
+        public static double ComputeBM25Score(Posting posting, int df, DocumentStore docs, double k, double b) {
             int n = docs.Count;
             double avdl = docs.AverageDocumentLength;
 
             var tf = posting.TermFrequency;
-            var dl = docs.GetLength(posting.DocumentId);
+            var dl = docs.GetLength(posting.DocumentId, posting.Field);
 
-            return BM25.ComputeScore(tf, df, n, dl, avdl, SearchConstants.K, SearchConstants.B);
+            return BM25.ComputeScore(tf, df, n, dl, avdl, k, b);
         }
 
         public static List<(string token, double boost)> FuzzySearch(
@@ -30,8 +30,11 @@ namespace Apollon.Core.Search {
             foreach (string term in Tokenizer.Tokenize(request)) {
                 expanded.Add((term, 1.0));
 
-                foreach (var fuzzy in fuzzyMatcher.Match(term, tokenRegistry, options)) {
-                    double boost = Math.Exp(-fuzzy.EditDistance);
+                foreach (var fuzzy in fuzzyMatcher
+                    .Match(term, tokenRegistry, options)
+                    .OrderBy(f => f.EditDistance)
+                    .Take(options.EditDistanceLimit)) {
+                    double boost = term == fuzzy.Token ? 10 : Math.Exp(-fuzzy.EditDistance);
                     expanded.Add((fuzzy.Token, boost));
                 }
             }
@@ -41,7 +44,8 @@ namespace Apollon.Core.Search {
         public static Dictionary<Guid, double> CreateScores(
             List<(string token, double boost)> expanded, 
             InvertedIndex _invertedIndex,
-            DocumentStore docs) {
+            DocumentStore docs,
+            QueryOptions options) {
 
             var scores = new Dictionary<Guid, double>();
 
@@ -50,7 +54,7 @@ namespace Apollon.Core.Search {
                 int df = postings.Count;
 
                 foreach (var posting in postings) {
-                    double bm25 = ComputeBM25Score(posting, df, docs);
+                    double bm25 = ComputeBM25Score(posting, df, docs, options.BM25K, options.BM25B);
                     
                     double finalScore = bm25 * boost;
 
