@@ -1,5 +1,5 @@
 namespace Apollon.Core.Analysis {
-    internal static class Tokenizer {
+    public static class Tokenizer {
         public static string[] Tokenize(string text, HashSet<string>? stopWords = null) {
             if (string.IsNullOrWhiteSpace(text)) return Array.Empty<string>();
 
@@ -12,6 +12,8 @@ namespace Apollon.Core.Analysis {
 
             foreach (var raw in rawTokens) {
                 var token = Normalizer.Normalize(raw);
+
+                if (string.IsNullOrWhiteSpace(token)) continue;
 
                 // Remove stopwords
                 if (stopWords != null && stopWords.Contains(token)) continue;

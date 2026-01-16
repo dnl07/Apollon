@@ -1,7 +1,11 @@
 namespace Apollon.Core.Analysis {
-    internal static class NGramGenerator {
+    public static class NGramGenerator {
         public static IReadOnlyList<string> Generate(string token, int nGramSize, bool prefixEditDistance = false) {
-            token = prefixEditDistance ? $"$${token}$$" : $"$${token}";
+            if(string.IsNullOrWhiteSpace(token)) return [];
+
+            string edgeSymbols = string.Join("", Enumerable.Repeat("$", nGramSize -1));
+
+            token = prefixEditDistance ?  $"{edgeSymbols}{token}" : $"{edgeSymbols}{token}{edgeSymbols}";
 
             List<string> nGrams = new List<string>();
 

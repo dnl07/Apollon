@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 
 namespace Apollon.Core.Analysis {
-    internal static class Normalizer {
+    public static class Normalizer {
         public static string Normalize(string token) {
             if (string.IsNullOrWhiteSpace(token)) return string.Empty;
 
@@ -18,7 +18,7 @@ namespace Apollon.Core.Analysis {
             token = token.Trim(
                 '.', ',', ':', ';', '!', '?',
                 '(', ')', '[', ']', '{', '}',
-                '"', '\'', '’', '“', '”'
+                '"', '\'', 'ï¿½', 'ï¿½', 'ï¿½'
             );
 
             if (!token.Any(char.IsLetterOrDigit)) return string.Empty;
