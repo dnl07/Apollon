@@ -2,6 +2,7 @@ using Apollon.Core.Documents;
 using Apollon.Core.Fuzzy;
 using Apollon.Core.Indexing;
 using Apollon.Core.Options;
+using Apollon.Core.Ranking;
 using Apollon.Models.Search;
 
 namespace Apollon.Core.Search {
@@ -16,6 +17,8 @@ namespace Apollon.Core.Search {
         private NGramIndex _nGramIndex = null!;
 
         private FuzzyMatcher _fuzzyMatcher = null!;
+        private QueryExpander _expander = null!;
+        private ScoringEngine _scoring = null!;
 
         public void Initialize(IndexOptions options) {
             if (_initialized) {
@@ -25,6 +28,8 @@ namespace Apollon.Core.Search {
             _options = options;
             _nGramIndex = new NGramIndex(_options.NGramSize);
             _fuzzyMatcher = new FuzzyMatcher(_nGramIndex, _options);
+            _expander = new QueryExpander();
+            _scoring = new ScoringEngine();
 
             _initialized = true;
         }
@@ -72,12 +77,12 @@ namespace Apollon.Core.Search {
             result.Query = request;
 
             // fuzzy string matching
-            var expanded = SearchUtils.FuzzySearch(request, _fuzzyMatcher, _tokens, options);
+            var expanded = _expander.Expand(request, _fuzzyMatcher, _tokens, options);
 
             result.UsedTokens = expanded.Select(e => e.token).ToList();
 
             // creates scores
-            Dictionary<Guid, double> scores = SearchUtils.CreateScores(expanded, _invertedIndex, _docs, options);
+            Dictionary<Guid, double> scores = _scoring.ScoreDocuments(expanded, _invertedIndex, _docs, options);
 
             result.Documents = scores.
                 OrderByDescending(d => d.Value)

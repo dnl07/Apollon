@@ -1,3 +1,4 @@
+using Apollon.Core.Analysis;
 using Apollon.Core.Indexing;
 
 namespace Apollon.Core.Documents {
@@ -5,11 +6,36 @@ namespace Apollon.Core.Documents {
         private readonly Dictionary<Guid, SearchDocument> _docs = new();
 
         private int _totalDocs;
+        private readonly Dictionary<Field, long> _totalFieldLengths = new();
+        private readonly Dictionary<Field, int> _docCountsPerField = new();
 
+        public DocumentStore() {
+            foreach (Field field in Enum.GetValues(typeof(Field))) {
+                _totalFieldLengths[field] = 0;
+                _docCountsPerField[field] = 0;
+            }
+        }
+
+        /// <summary>
+        /// Adds a document and updates field statistics.
+        /// </summary>
         public void Add(SearchDocument doc) {
             _docs[doc.Id] = doc;
             _totalDocs++;
-            AverageDocumentLength = (double)_totalDocs / _docs.Count;
+
+            UpdateFieldLengths(doc.Title, Field.Title);
+            UpdateFieldLengths(doc.Description, Field.Description);
+            UpdateFieldLengths(string.Join(" ", doc.Tags), Field.Tags);
+        }
+
+        private void UpdateFieldLengths(string? text, Field field) {
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            var tokens = Tokenizer.Tokenize(text);
+            if (tokens.Length == 0) return;
+
+            _totalFieldLengths[field] += tokens.Length;
+            _docCountsPerField[field]++;
         }
 
         public SearchDocument Get(Guid id) {
@@ -17,18 +43,30 @@ namespace Apollon.Core.Documents {
         }
 
         public int GetLength(Guid id, Field field) {
-            var d = _docs[id];
+            if (!_docs.TryGetValue(id, out var doc)) return 0;
 
-            return field switch {
-                Field.Title => d.Title.Length,
-                Field.Description => d.Description.Length,
-                Field.Tags => d.Tags.Length,
-                _ => 0,
+            string text = field switch {
+                Field.Title => doc.Title,
+                Field.Description => doc.Description,
+                Field.Tags => string.Join(" ", doc.Tags),
+                _ => "",
             };
+
+            if (string.IsNullOrWhiteSpace(text)) return 0;
+
+            return Tokenizer.Tokenize(text).Length;
         }
 
         public int Count => _docs.Count;
 
-        public double AverageDocumentLength { get; private set; }
+        /// <summary>
+        /// Returns the average field length in tokens.
+        /// </summary>
+        public double GetAverageFieldLength(Field field) {
+            int docCount = _docCountsPerField[field];
+            if (docCount == 0) return 0;
+
+            return (double)_totalFieldLengths[field] / docCount;
+        }
     }
 }
