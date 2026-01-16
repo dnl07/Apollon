@@ -2,6 +2,7 @@
 using Apollon.Models.Api;
 using Apollon.Models.Search;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Apollon.Api.Controllers {
 
@@ -15,8 +16,10 @@ namespace Apollon.Api.Controllers {
 
         [HttpPost]
         public ActionResult<SearchResult> Search([FromBody] SearchRequest request) {
+            var watch = new Stopwatch();
             SearchResult searchResult = _searchEngine.Search(request.Query, request.Options);
-            
+            watch.Stop();
+            Debug.WriteLine($"Search took {watch.ElapsedMilliseconds}ms");
             return Ok(searchResult);
         }
     }
