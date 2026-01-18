@@ -5,19 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace Apollon.Api.Controllers {
     [ApiController]
     [Route("engine")]
-    public class OptionsController : ControllerBase {
+    public class EngineController : ControllerBase {
         private readonly SearchEngine _searchEngine;
 
-        public OptionsController(SearchEngine searchEngine) {
+        public EngineController(SearchEngine searchEngine) {
             _searchEngine = searchEngine; 
         }
 
         [HttpPost("init")]
         public IActionResult Add([FromBody] IndexOptions options) {
-           
-
-
-
             _searchEngine.Initialize(options);
             return Ok(new { status = "options changed" });
         }

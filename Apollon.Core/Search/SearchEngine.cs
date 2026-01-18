@@ -55,7 +55,7 @@ namespace Apollon.Core.Search {
             _docs.Add(doc);
             _invertedIndex.AddDocument(doc, titleTokens, descTokens, tagTokens);
 
-            var allTokens = new HashSet<string>((titleTokens));
+            var allTokens = new HashSet<string>(titleTokens);
             allTokens.UnionWith(descTokens);
             allTokens.UnionWith(tagTokens);
 
@@ -70,8 +70,10 @@ namespace Apollon.Core.Search {
             return doc;
         }
 
-        public SearchResult Search(string request, QueryOptions options) {
+        public SearchResult Search(string request, QueryOptions? options = null) {
             EnsureInitialized();
+
+            options ??= new QueryOptions();
 
             var result = new SearchResult();
             result.Query = request;
