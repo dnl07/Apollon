@@ -1,5 +1,6 @@
-﻿using Apollon.Core.Search;
-using Apollon.Models.Api;
+﻿using Apollon.Api.Dto.Search;
+using Apollon.Api.Mappers.Search;
+using Apollon.Core.Search;
 using Apollon.Models.Search;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -14,37 +15,29 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpGet]
-        public ActionResult<SearchResponse> Search([FromQuery] string query) {
+        public ActionResult<SearchResponseDto> Search([FromQuery] string query) {
             var watch = new Stopwatch();
             watch.Start();
             SearchResult searchResult = _searchEngine.Search(query);
             watch.Stop();
             
-            var searchResponse = new SearchResponse();
-             
-            searchResponse.Query = searchResult.Query;
-            searchResponse.UsedTokes = searchResult.UsedTokens;
-            searchResponse.Docs = searchResult.Documents;
+            var searchResponse = searchResult.ToDto();
             searchResponse.ElapsedTime = watch.ElapsedMilliseconds;
 
-            return Ok(searchResponse);           
+            return Ok(searchResponse); 
         }
 
         [HttpPost]
-        public ActionResult<SearchResponse> Search([FromBody] SearchRequest request) {
+        public ActionResult<SearchResponseDto> Search([FromBody] SearchRequestDto request) {
             var watch = new Stopwatch();
             watch.Start();
             SearchResult searchResult = _searchEngine.Search(request.Query, request.Options);
             watch.Stop();
             
-            var searchResponse = new SearchResponse();
-             
-            searchResponse.Query = searchResult.Query;
-            searchResponse.UsedTokes = searchResult.UsedTokens;
-            searchResponse.Docs = searchResult.Documents;
+            var searchResponse = searchResult.ToDto();
             searchResponse.ElapsedTime = watch.ElapsedMilliseconds;
 
-            return Ok(searchResponse);
+            return Ok(searchResponse); 
         }
     }
 }

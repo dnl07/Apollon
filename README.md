@@ -76,12 +76,26 @@ Example response with explanation:
     }]
 }
 ```
-Search with options:
+Search with own options:
 ```
 {
     "query": "string",
     "options": {
-        TODO
+        "limit": 0,
+        fuzzy: {
+            "maxeditdistance": 0,
+            "editdistancelimit": 0,
+            "prefixdistancelimit": 0
+        },
+        "score": {
+            "k": 0,
+            "b": 0,
+            "boost": {
+                "title": 0,
+                "description": 0,
+                "tags": 0
+            }
+        }
     }
 }
 ```

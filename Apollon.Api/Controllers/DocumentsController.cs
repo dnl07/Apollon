@@ -1,6 +1,7 @@
-﻿using Apollon.Core.Documents;
+﻿using Apollon.Api.Dto.Documents;
+using Apollon.Api.Mappers.Document;
+using Apollon.Core.Documents;
 using Apollon.Core.Search;
-using Apollon.Models.Api;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -15,30 +16,36 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpPost]
-        public ActionResult<DocumentResponse> Add([FromBody] SearchDocument document) {
-            var doc = _searchEngine.AddDocument(document);
+        public ActionResult<DocumentResponseDto> Add([FromBody] DocumentRequestDto document) {
+            var doc = _searchEngine.AddDocument(document.ToEngineModel());
 
-            var response = new DocumentResponse();
-            response.Documents = [doc.Title];
+            var response = new DocumentResponseDto {
+                Status = "Successfully added",
+                TotalAdded = 1,
+                AddedDocuments = [doc.ToDto()]
+            };
 
-            return Ok(new { status = "document added", response});
+            return Ok(response);
         }
 
         [HttpPost("bulk")]
-        public ActionResult<DocumentResponse> AddBulk([FromBody] SearchDocument[] documents) {
-            var response = new DocumentResponse();
+        public ActionResult<DocumentResponseDto> AddBulk([FromBody] SearchDocument[] documents) {
+            var documentsDto = new List<DocumentDto>();
+            
             var watch = new Stopwatch();
-
             watch.Start();
             foreach (var doc in documents) {
-                Guid id = _searchEngine.AddDocument(doc).Id;
-                response.Documents.Add(id.ToString());
+                documentsDto.Add(doc.ToDto());
             }
             watch.Stop();
 
-            response.ElapsedTime = watch.ElapsedMilliseconds;
+            var response = new DocumentResponseDto {
+                Status = "Successfully added",
+                TotalAdded = documentsDto.Count,
+                AddedDocuments = documentsDto.ToArray()
+            };
 
-            return Ok(new { status = $"{response.Documents.Count} documents added!", response });
+            return Ok(response);
         }
     }
 }
