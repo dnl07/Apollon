@@ -32,7 +32,7 @@ Document JSON structure:
 }
 ```
 
-### Seach
+### Search
 Endpoints:
 - ```GET /search?q=...``` - Simple search
 - ```GET /search?q=...&explain=true``` - Simple search with explanation
@@ -49,7 +49,7 @@ Example response:
         "fields": {
             "title": "string",
             "description": "string",
-            "tags": "string",        
+            "tags": ["string"]     
         }
     }]
 }
@@ -63,7 +63,7 @@ Example response with explanation:
         "fields": {
             "title": "string",
             "description": "string",
-            "tags": "string",        
+            "tags": ["string"]     
         },
         "explain": {
             "bm25": {
@@ -102,14 +102,25 @@ Search with own options:
 
 ### Engine Configuration
 - ```POST /engine/init```- Initializes the search engine with custom options (should be done before adding documents)
-TODO: example json
+
+Initialize with own options:
+```
+{
+    "stopwords": ["string"],
+    "ngramsize": 0
+}
+```
 - TODO: ```GET /engine/status``` - Returns the status of the engine and additional information about the used structures (like index size or total number of documents)
 
+Example response:
+```
+{
+    "isRunning" = true,
+    "startetAt" = 0,
+    "totalDocuments": 0,
+    "totalTokens": 0,
+    "indexSize": 0
+}
+```
 ### Health
 - ```GET /health``` - Returns basic status of the search engine
-
-## How does it work?
-### BM25-Scoring
-TODO
-### Fuzzy Search
-TODO
