@@ -4,6 +4,8 @@ namespace Apollon.Core.Indexing {
     public class InvertedIndex {
         private readonly Dictionary<string, List<Posting>> _invertedIndex = new();
 
+        public int Count => _invertedIndex.Count;
+
         public void AddDocument(SearchDocument doc, HashSet<string> titleTokens, HashSet<string> descriptionTokens, HashSet<string> tagTokens) {
             AddTokens(doc, titleTokens, Field.Title);
             AddTokens(doc, descriptionTokens, Field.Description);

@@ -5,6 +5,8 @@
 
         private int _idCounter = 0;
 
+        public int Count => _tokenToId.Count;
+
         /// <summary>
         /// Adds the token to the N-Gram-Index.
         /// </summary>

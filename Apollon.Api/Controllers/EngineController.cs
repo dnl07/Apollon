@@ -1,3 +1,5 @@
+using Apollon.Api.Dto.Engine;
+using Apollon.Api.Mappers.Status;
 using Apollon.Core.Options;
 using Apollon.Core.Search;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +18,11 @@ namespace Apollon.Api.Controllers {
         public IActionResult Add([FromBody] IndexOptions options) {
             _searchEngine.Initialize(options);
             return Ok(new { status = "options changed" });
+        }
+
+        [HttpGet("status")]
+        public ActionResult<StatusDto> GetStatus() {
+            return _searchEngine.GetStatus().ToDto();
         }
     }
 }

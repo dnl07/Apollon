@@ -20,6 +20,14 @@ namespace Apollon.Core.Search {
         private QueryExpander _expander = null!;
         private ScoringEngine _scoring = null!;
 
+        private bool _isRunning = false;
+        private DateTime _startedAt;
+
+        public SearchEngine() {
+            _isRunning = true;
+            _startedAt = DateTime.Now;
+        }
+
         public void Initialize(IndexOptions options) {
             if (_initialized) {
                 throw new InvalidOperationException("SearchEngine is already initialized.");
@@ -93,6 +101,20 @@ namespace Apollon.Core.Search {
                 .ToList();
 
             return result;
+        }
+
+        public SearchStatus GetStatus(bool onlyRunning = false) {
+            if (onlyRunning) return new SearchStatus {
+              IsRunning = _isRunning  
+            };
+
+            return new SearchStatus {
+                IsRunning = _isRunning,
+                StartetAt = _startedAt,
+                TotalDocuments = _docs.Count,
+                TotalTokens = _tokens.Count,
+                IndexSize = _invertedIndex.Count
+            };
         }
     }
 }
