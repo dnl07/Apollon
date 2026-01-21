@@ -7,14 +7,21 @@ namespace Apollon.Api.Mappers.Search {
             List<SearchHitDto> hits = new();
 
             foreach (var hit in result.Hits) {
-                hits.Add(new SearchHitDto {
+                var hitDto = new SearchHitDto {
                     Id = hit.Document.Id,
                     Fields = new SearchFieldDto {
                         Title = hit.Document.Title,
                         Description = hit.Document.Description,
                         Tags = hit.Document.Tags
-                    }
-                });
+                    },
+                };
+                if (hit.Explain != null) {
+                    hitDto.Explain = new SearchExplainDto {
+                        FinalScore = hit.Explain.FinalScore,
+                        Contributions = hit.Explain.Contributions
+                    };
+                }
+                hits.Add(hitDto);
             }
 
             return new SearchResponseDto {

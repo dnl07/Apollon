@@ -64,13 +64,19 @@ namespace Apollon.Core.Ranking {
             int n = docs.Count;
             var field = posting.Field;
 
+            if (n <= 0 || df <= 0 || df > n) return 0.0;
+
             // Average length of the field
             double avdl = docs.GetAverageFieldLength(field);
+            if (avdl <= 0) return 0.0;
 
             var tf = posting.TermFrequency;
             var dl = docs.GetLength(posting.DocumentId, posting.Field);
 
             double bm25 = BM25.ComputeScore(tf, df, n, dl, avdl, options.BM25K, options.BM25B);
+            
+            if (double.IsNaN(bm25) || double.IsInfinity(bm25)) return 0.0;
+            
             return bm25;
         }
     }
