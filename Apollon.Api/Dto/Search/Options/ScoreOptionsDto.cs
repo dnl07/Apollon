@@ -1,7 +1,7 @@
 namespace Apollon.Api.Dto.Search {
     public class ScoreOptionsDto {
-        public double K = 0;
-        public double B = 0;
-        public BoostOptionsDto boost = new BoostOptionsDto();
+        public double K { get; set; } = 0;
+        public double B { get; set; } = 0;
+        public BoostOptionsDto boost { get; set; } = new BoostOptionsDto();
     }
 }

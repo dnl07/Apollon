@@ -1,9 +1,7 @@
 ﻿using Apollon.Api.Dto.Documents;
 using Apollon.Api.Mappers.Document;
-using Apollon.Core.Documents;
 using Apollon.Core.Search;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace Apollon.Api.Controllers {
     [ApiController]
@@ -15,9 +13,9 @@ namespace Apollon.Api.Controllers {
             _searchEngine = searchEngine; 
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public ActionResult<DocumentResponseDto> Add([FromBody] DocumentRequestDto document) {
-            var doc = _searchEngine.AddDocument(document.ToEngineModel());
+            var doc =_searchEngine.AddDocument(document.ToEngineModel());
 
             var response = new DocumentResponseDto {
                 Status = "Successfully added",
@@ -29,20 +27,18 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpPost("bulk")]
-        public ActionResult<DocumentResponseDto> AddBulk([FromBody] SearchDocument[] documents) {
-            var documentsDto = new List<DocumentDto>();
-            
-            var watch = new Stopwatch();
-            watch.Start();
+        public ActionResult<DocumentResponseDto> AddBulk([FromBody] DocumentRequestDto[] documents) {
+            var dtos = new List<DocumentDto>();
+
             foreach (var doc in documents) {
-                documentsDto.Add(doc.ToDto());
+                var addedDoc = _searchEngine.AddDocument(doc.ToEngineModel());
+                dtos.Add(addedDoc.ToDto());
             }
-            watch.Stop();
 
             var response = new DocumentResponseDto {
                 Status = "Successfully added",
-                TotalAdded = documentsDto.Count,
-                AddedDocuments = documentsDto.ToArray()
+                TotalAdded = dtos.Count,
+                AddedDocuments = dtos.ToArray()
             };
 
             return Ok(response);

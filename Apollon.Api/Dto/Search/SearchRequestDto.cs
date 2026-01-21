@@ -1,8 +1,6 @@
-﻿using Apollon.Core.Options;
-
-namespace Apollon.Api.Dto.Search {
+﻿namespace Apollon.Api.Dto.Search {
     public class SearchRequestDto {
         public string Query { get; set; } = "";
-        public QueryOptions Options { get; set; } = new();
+        public QueryOptionsDto Options { get; set; } = new();
     }
 }

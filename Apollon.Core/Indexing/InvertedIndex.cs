@@ -1,4 +1,5 @@
 using Apollon.Core.Documents;
+using Apollon.Models.Indexing;
 
 namespace Apollon.Core.Indexing {
     public class InvertedIndex {

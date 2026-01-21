@@ -1,16 +1,19 @@
 ﻿using Apollon.Core.Documents;
 using Apollon.Core.Indexing;
 using Apollon.Core.Options;
+using Apollon.Models.Indexing;
+using Apollon.Models.Scoring;
 
 namespace Apollon.Core.Ranking {
     public class ScoringEngine {
-        public Dictionary<Guid, double> ScoreDocuments(
+        public Dictionary<Guid, ScoreResult> ScoreDocuments(
             List<(string token, double boost)> expanded,
             InvertedIndex _invertedIndex,
             DocumentStore docs,
-            QueryOptions options) {
+            QueryOptions options,
+            bool explain) {
 
-            var scores = new Dictionary<Guid, double>();
+            var scores = new Dictionary<Guid, ScoreResult>();
 
             foreach ((string term, double boost) in expanded) {
                 var postings = _invertedIndex.GetSortedPostings(term);
@@ -28,10 +31,26 @@ namespace Apollon.Core.Ranking {
 
                     double finalScore = bm25 * boost * fieldWeight;
 
-                    if (scores.TryGetValue(posting.DocumentId, out var currentScore)) {
-                        scores[posting.DocumentId] = currentScore + finalScore;
-                    } else {
-                        scores[posting.DocumentId] = finalScore;
+                    if (!scores.TryGetValue(posting.DocumentId, out var score)) {
+                        score = new ScoreResult();
+                        scores[posting.DocumentId] = score;
+                    }
+
+                    score.FinalScore += finalScore;
+
+                    if (explain) {
+                        if (!score.Contributions.TryGetValue(term, out var contributions)) {
+                            contributions = new List<ScoreContribution>();
+                            score.Contributions[term] = contributions; 
+                        }
+
+                        contributions.Add(new ScoreContribution {
+                           Field = posting.Field,
+                           BM25 = bm25,
+                           Boost = boost,
+                           FieldWeight = fieldWeight,
+                           Final = finalScore 
+                        });
                     }
                 }
             }

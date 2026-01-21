@@ -1,8 +1,6 @@
-using Apollon.Models.Scoring;
-
-namespace Apollon.Api.Dto.Search {
-    public class SearchExplainDto {
+namespace Apollon.Models.Scoring {
+    public class ScoreResult {
     public double FinalScore { get; set; }
     public Dictionary<string, List<ScoreContribution>> Contributions { get; set; } = new();
-    }
+}
 }

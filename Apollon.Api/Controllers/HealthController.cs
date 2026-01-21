@@ -1,4 +1,3 @@
-using Apollon.Api.Mappers.Status;
 using Apollon.Core.Search;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +13,10 @@ namespace Apollon.Api.Controllers {
 
         [HttpGet]
         public IActionResult GetHealth() {
-            return Ok(_searchEngine.GetStatus(true).ToDto());
+            if (_searchEngine.GetStatus().IsRunning) {
+                return Ok();
+            }
+            return NotFound();
         }
     }
 }

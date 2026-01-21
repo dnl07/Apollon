@@ -3,5 +3,6 @@ namespace Apollon.Api.Dto.Search {
         public int Limit { get; set; } = 0;
         public FuzzyOptionsDto Fuzzy { get; set; } = new FuzzyOptionsDto();
         public ScoreOptionsDto Score { get; set; } = new ScoreOptionsDto();
+        public bool Explain { get; set; } = false;
     }
 }

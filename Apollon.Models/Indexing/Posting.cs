@@ -1,10 +1,4 @@
-namespace Apollon.Core.Indexing {
-    public enum Field {
-        Title,
-        Description,
-        Tags
-    }
-
+namespace Apollon.Models.Indexing {
     public class Posting {
         public Guid DocumentId { get; }
         public int TermFrequency { get; set; }

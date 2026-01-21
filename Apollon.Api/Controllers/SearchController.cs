@@ -1,4 +1,5 @@
 ﻿using Apollon.Api.Dto.Search;
+using Apollon.Api.Mappers.Options;
 using Apollon.Api.Mappers.Search;
 using Apollon.Core.Search;
 using Apollon.Models.Search;
@@ -15,10 +16,10 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpGet]
-        public ActionResult<SearchResponseDto> Search([FromQuery] string query) {
+        public ActionResult<SearchResponseDto> Search([FromQuery] string query, bool explain = false) {
             var watch = new Stopwatch();
             watch.Start();
-            SearchResult searchResult = _searchEngine.Search(query);
+            SearchResult searchResult = _searchEngine.Search(query, explain, null);
             watch.Stop();
             
             var searchResponse = searchResult.ToDto();
@@ -31,7 +32,7 @@ namespace Apollon.Api.Controllers {
         public ActionResult<SearchResponseDto> Search([FromBody] SearchRequestDto request) {
             var watch = new Stopwatch();
             watch.Start();
-            SearchResult searchResult = _searchEngine.Search(request.Query, request.Options);
+            SearchResult searchResult = _searchEngine.Search(request.Query, request.Options.Explain, request.Options.ToEngineModel());
             watch.Stop();
             
             var searchResponse = searchResult.ToDto();

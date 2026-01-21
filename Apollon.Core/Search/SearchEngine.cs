@@ -3,6 +3,8 @@ using Apollon.Core.Fuzzy;
 using Apollon.Core.Indexing;
 using Apollon.Core.Options;
 using Apollon.Core.Ranking;
+using Apollon.Models.Indexing;
+using Apollon.Models.Scoring;
 using Apollon.Models.Search;
 
 namespace Apollon.Core.Search {
@@ -78,9 +80,9 @@ namespace Apollon.Core.Search {
             return doc;
         }
 
-        public SearchResult Search(string request, QueryOptions? options = null) {
+        public SearchResult Search(string request, bool explain, QueryOptions? options = null) {
             EnsureInitialized();
-
+        
             options ??= new QueryOptions();
 
             var result = new SearchResult();
@@ -89,15 +91,16 @@ namespace Apollon.Core.Search {
             // fuzzy string matching
             var expanded = _expander.Expand(request, _fuzzyMatcher, _tokens, options);
 
-            result.UsedTokens = expanded.Select(e => e.token).ToList();
-
             // creates scores
-            Dictionary<Guid, double> scores = _scoring.ScoreDocuments(expanded, _invertedIndex, _docs, options);
+            Dictionary<Guid, ScoreResult> scores = _scoring.ScoreDocuments(expanded, _invertedIndex, _docs, options, explain);
 
-            result.Documents = scores.
-                OrderByDescending(d => d.Value)
+            result.Hits = scores.
+                OrderByDescending(d => d.Value.FinalScore)
                 .Take(options.MaxDocs)
-                .Select(d => _docs.Get(d.Key))
+                .Select(d => new SearchHit {
+                    Document = _docs.Get(d.Key),
+                    Explain = explain ? d.Value : null
+                })
                 .ToList();
 
             return result;
