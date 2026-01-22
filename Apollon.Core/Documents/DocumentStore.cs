@@ -1,5 +1,4 @@
 using Apollon.Core.Analysis;
-using Apollon.Core.Indexing;
 using Apollon.Models.Indexing;
 
 namespace Apollon.Core.Documents {
