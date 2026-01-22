@@ -1,4 +1,5 @@
-﻿using Apollon.Api.Dto.Documents;
+﻿using System.Diagnostics;
+using Apollon.Api.Dto.Documents;
 using Apollon.Api.Mappers.Document;
 using Apollon.Core.Search;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +16,15 @@ namespace Apollon.Api.Controllers {
 
         [HttpPost("add")]
         public ActionResult<DocumentResponseDto> Add([FromBody] DocumentRequestDto document) {
+            var watch = new Stopwatch();
+            watch.Start();
             var doc =_searchEngine.AddDocument(document.ToEngineModel());
+            watch.Stop();
 
             var response = new DocumentResponseDto {
                 Status = "Successfully added",
                 TotalAdded = 1,
+                TookMs = watch.ElapsedMilliseconds,
                 AddedDocuments = [doc.ToDto()]
             };
 
@@ -30,14 +35,18 @@ namespace Apollon.Api.Controllers {
         public ActionResult<DocumentResponseDto> AddBulk([FromBody] DocumentRequestDto[] documents) {
             var dtos = new List<DocumentDto>();
 
+            var watch = new Stopwatch();
+            watch.Start();
             foreach (var doc in documents) {
                 var addedDoc = _searchEngine.AddDocument(doc.ToEngineModel());
                 dtos.Add(addedDoc.ToDto());
             }
+            watch.Stop();
 
             var response = new DocumentResponseDto {
                 Status = "Successfully added",
                 TotalAdded = dtos.Count,
+                TookMs = watch.ElapsedMilliseconds,
                 AddedDocuments = dtos.ToArray()
             };
 

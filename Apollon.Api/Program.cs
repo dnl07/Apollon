@@ -6,7 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddControllers()
     .AddJsonOptions(options => {
+        options.JsonSerializerOptions.DictionaryKeyPolicy = null;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
 builder.Services.AddEndpointsApiExplorer();

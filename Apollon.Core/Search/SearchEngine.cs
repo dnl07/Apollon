@@ -58,9 +58,9 @@ namespace Apollon.Core.Search {
 
             doc.Id = Guid.NewGuid();
 
-            var titleTokens = DocumentUtils.GetTokensOfDocumentField(doc, Field.Title, _options.StopWords);
-            var descTokens = DocumentUtils.GetTokensOfDocumentField(doc, Field.Description, _options.StopWords);
-            var tagTokens = DocumentUtils.GetTokensOfDocumentField(doc, Field.Tags, _options.StopWords);
+            var titleTokens = doc.GetTokens(Field.Title, _options.StopWords);
+            var descTokens = doc.GetTokens(Field.Description, _options.StopWords);
+            var tagTokens = doc.GetTokens(Field.Tags, _options.StopWords);
 
             _docs.Add(doc);
             _invertedIndex.AddDocument(doc, titleTokens, descTokens, tagTokens);

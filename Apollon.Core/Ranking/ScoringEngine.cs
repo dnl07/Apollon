@@ -47,7 +47,7 @@ namespace Apollon.Core.Ranking {
                         contributions.Add(new ScoreContribution {
                            Field = posting.Field,
                            BM25 = bm25,
-                           Boost = boost,
+                           FuzzyBoost = boost,
                            FieldWeight = fieldWeight,
                            Final = finalScore 
                         });
@@ -60,7 +60,7 @@ namespace Apollon.Core.Ranking {
         /// <summary>
         /// Calculates the BM25-Score for a posting given all documents.
         /// </summary>
-        private double ComputeBM25Score(Posting posting, int df, DocumentStore docs, QueryOptions options) {
+        private static double ComputeBM25Score(Posting posting, int df, DocumentStore docs, QueryOptions options) {
             int n = docs.Count;
             var field = posting.Field;
 

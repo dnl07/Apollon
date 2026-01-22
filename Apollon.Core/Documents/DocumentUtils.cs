@@ -3,7 +3,7 @@ using Apollon.Models.Indexing;
 
 namespace Apollon.Core.Documents {
     public static class DocumentUtils {
-        public static HashSet<string> GetTokensOfDocumentField(SearchDocument doc, Field field, HashSet<string>? stopWords = null) {
+        public static HashSet<string> GetTokens(this SearchDocument doc, Field field, HashSet<string>? stopWords = null) {
             var relevantText = field switch {
                 Field.Title => doc.Title,
                 Field.Description => doc.Description,
