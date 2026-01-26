@@ -20,6 +20,15 @@ namespace Apollon.Core.Indexing {
             }
         }
 
+        public void RemoveToken(string token, int id) {
+            foreach (var nGram in NGramGenerator.Generate(token, _nGramSize)) {
+                if (_nGramIndex.TryGetValue(nGram, out var ids)) {
+                    ids.Remove(id);
+                    if (ids.Count == 0) _nGramIndex.Remove(nGram);
+                }
+            }
+        }
+
         public HashSet<int> GetCandidates(string nGram) {
             if (_nGramIndex.TryGetValue(nGram, out var candidates)) {  
                 return candidates ?? []; 

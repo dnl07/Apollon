@@ -3,7 +3,6 @@ using Apollon.Core.Fuzzy;
 using Apollon.Core.Indexing;
 using Apollon.Core.Options;
 using Apollon.Core.Ranking;
-using Apollon.Models.Indexing;
 using Apollon.Models.Scoring;
 using Apollon.Models.Search;
 
@@ -58,16 +57,12 @@ namespace Apollon.Core.Search {
 
             doc.Id = Guid.NewGuid();
 
-            var titleTokens = doc.GetTokens(Field.Title, _options.StopWords);
-            var descTokens = doc.GetTokens(Field.Description, _options.StopWords);
-            var tagTokens = doc.GetTokens(Field.Tags, _options.StopWords);
+            doc.Tokenize(_options.StopWords);
 
             _docs.Add(doc);
-            _invertedIndex.AddDocument(doc, titleTokens, descTokens, tagTokens);
+            _invertedIndex.AddDocument(doc);
 
-            var allTokens = new HashSet<string>(titleTokens);
-            allTokens.UnionWith(descTokens);
-            allTokens.UnionWith(tagTokens);
+            var allTokens = doc.AllTokens;
 
             foreach (string token in allTokens) {
                 var id = _tokens.Add(token);
@@ -78,6 +73,24 @@ namespace Apollon.Core.Search {
             }
 
             return doc;
+        }
+
+        public void RemoveDocument(Guid docId) {
+            var doc = _docs.Get(docId);
+
+            _docs.Remove(doc.Id);
+            _invertedIndex.RemoveDocument(doc);
+            
+            foreach (var token in doc.AllTokens) {
+                var tokenId = _tokens.GetIdOfToken(token);
+                _tokens.Remove(token);
+                _nGramIndex.RemoveToken(token, tokenId);
+            }
+        }
+
+        public void UpdateDocument(Guid oldId, SearchDocument newDoc) {
+            RemoveDocument(oldId);
+            AddDocument(newDoc);
         }
 
         public SearchResult Search(string request, bool explain, QueryOptions? options = null) {

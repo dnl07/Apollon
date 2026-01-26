@@ -71,7 +71,7 @@ namespace Apollon.Core.Ranking {
             if (avdl <= 0) return 0.0;
 
             var tf = posting.TermFrequency;
-            var dl = docs.GetLength(posting.DocumentId, posting.Field);
+            var dl = docs.GetFieldLength(posting.DocumentId, posting.Field);
 
             double bm25 = BM25.ComputeScore(tf, df, n, dl, avdl, options.BM25K, options.BM25B);
             

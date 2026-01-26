@@ -7,6 +7,14 @@
 
         public int Count => _tokenToId.Count;
 
+        public string GetToken(int id) {
+            return _idToToken[id];
+        }
+
+        public int GetIdOfToken(string token) {
+            return _tokenToId[token];
+        }
+
         /// <summary>
         /// Adds the token to the N-Gram-Index.
         /// </summary>
@@ -22,12 +30,10 @@
             return -1;
         }
 
-        public string GetToken(int id) {
-            return _idToToken[id];
-        }
-
-        public int GetIdOfToken(string token) {
-            return _tokenToId[token];
+        public void Remove(string token) {
+            var tokenId = _tokenToId[token];
+            _tokenToId.Remove(token);
+            _idToToken.Remove(tokenId);
         }
     }
 }

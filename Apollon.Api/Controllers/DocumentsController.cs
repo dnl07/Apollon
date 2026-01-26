@@ -52,5 +52,18 @@ namespace Apollon.Api.Controllers {
 
             return Ok(response);
         }
+
+        [HttpPut("update/{id:Guid}")]
+        public IActionResult Update(Guid id, [FromBody] DocumentRequestDto doc) {
+            _searchEngine.UpdateDocument(id, doc.ToEngineModel());
+            return Ok();
+        }
+
+ 
+        [HttpPut("remove/{id:Guid}")]
+        public IActionResult Remove(Guid id) {
+            _searchEngine.RemoveDocument(id);
+            return Ok();
+        }       
     }
 }

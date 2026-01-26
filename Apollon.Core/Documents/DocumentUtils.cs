@@ -1,17 +1,31 @@
+using System.Collections;
+using System.Net;
 using Apollon.Core.Analysis;
 using Apollon.Models.Indexing;
 
 namespace Apollon.Core.Documents {
     public static class DocumentUtils {
-        public static HashSet<string> GetTokens(this SearchDocument doc, Field field, HashSet<string>? stopWords = null) {
-            var relevantText = field switch {
-                Field.Title => doc.Title,
-                Field.Description => doc.Description,
-                Field.Tags => string.Join(" ", doc.Tags ?? Array.Empty<string>()),
-                _ => ""
-            };
+        public static void Tokenize(this SearchDocument doc, HashSet<string>? stopWords = null) {
+            doc.TitleTokens = Tokenizer.Tokenize(doc.Title, stopWords);
+            doc.DescriptionTokens = Tokenizer.Tokenize(doc.Description, stopWords);
+            doc.TagsTokens = Tokenizer.Tokenize(string.Join(" ", doc.Tags), stopWords);
+            doc.AllTokens = doc.GetAllTokens();
+        }
 
-            return Tokenizer.Tokenize(relevantText, stopWords).ToHashSet();
+        public static string[] GetFieldTokens(this SearchDocument doc, Field field) {
+            return field switch {
+                Field.Title => doc.TitleTokens,
+                Field.Description => doc.DescriptionTokens,
+                Field.Tags => doc.TagsTokens,
+                _ => []
+            };
+        }
+
+        private static string[] GetAllTokens(this SearchDocument doc) {
+            return doc.TitleTokens
+            .Concat(doc.DescriptionTokens)
+            .Concat(doc.TagsTokens)
+            .ToArray();
         }
     }
 }
