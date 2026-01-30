@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Net;
 using Apollon.Core.Analysis;
 using Apollon.Models.Indexing;
 

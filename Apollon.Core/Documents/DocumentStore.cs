@@ -18,8 +18,11 @@ namespace Apollon.Core.Documents {
             }
         }
 
-        public SearchDocument Get(Guid id) {
-            return _docs[id];
+        public SearchDocument? Get(Guid id) {
+            if (_docs.TryGetValue(id, out var doc)) {
+                return doc;
+            }
+            return null;
         }
 
         /// <summary>
