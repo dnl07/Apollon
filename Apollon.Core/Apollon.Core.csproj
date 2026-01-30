@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Apollon.Models\Apollon.Models.csproj" />
+    <EmbeddedResource Include="Data\stopwords_en.tsv" />
   </ItemGroup>
 
   <PropertyGroup>

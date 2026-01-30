@@ -1,3 +1,4 @@
+using Apollon.Core.Analysis;
 using Apollon.Core.Documents;
 using Apollon.Core.Fuzzy;
 using Apollon.Core.Indexing;
@@ -34,6 +35,8 @@ namespace Apollon.Core.Search {
                 throw new InvalidOperationException("SearchEngine is already initialized.");
             }
 
+            // TODO: Change init multiple times before adding documents
+
             _options = options;
             _nGramIndex = new NGramIndex(_options.NGramSize);
             _fuzzyMatcher = new FuzzyMatcher(_nGramIndex, _options);
@@ -57,7 +60,9 @@ namespace Apollon.Core.Search {
 
             doc.Id = Guid.NewGuid();
 
-            doc.Tokenize(_options.StopWords);
+            var stopwords = StopwordsProvider.ResolveStopwords(_options);
+
+            doc.Tokenize(stopwords);
 
             _docs.Add(doc);
             _invertedIndex.AddDocument(doc);
@@ -77,6 +82,8 @@ namespace Apollon.Core.Search {
 
         public void RemoveDocument(Guid docId) {
             var doc = _docs.Get(docId);
+
+            if (doc == null) return;
 
             _docs.Remove(doc.Id);
             _invertedIndex.RemoveDocument(doc);
@@ -115,7 +122,7 @@ namespace Apollon.Core.Search {
                     Explain = explain ? d.Value : null
                 })
                 .ToList();
-
+            // TODO: Better Take() performance
             return result;
         }
 
