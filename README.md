@@ -18,17 +18,17 @@ It provides simple document ranking based on relevance and supports approximate 
 
 ### Documents
 Endpoints:
-- ```POST /document/add```- Adds a single document
-- ```POST /document/bulk```- Adds multiple documents at once
-- ```PUT /document/update/{id}```- Updates a document
-- ```DELETE /document/delete/{id}```- Deletes a document
+- ```POST /documents/add```- Adds a single document
+- ```POST /documents/bulk```- Adds multiple documents at once
+- ```PUT /documents/update/{id}```- Updates a document
+- ```DELETE /documents/delete/{id}```- Deletes a document
 
 Document JSON structure:
 ```
 {
     "title": "string",
     "description": "string",
-    "tags": ["string", "string"]
+    "tags": ["string"]
 }
 ```
 
@@ -43,7 +43,7 @@ Example response:
 {
     "query": "string",
     "total": 0,
-    "tookMs": 0,
+    "elapsedTime": 0,
     "hits": [{
         "id": 0,
         "fields": {
@@ -66,12 +66,18 @@ Example response with explanation:
             "tags": ["string"]     
         },
         "explain": {
-            "bm25": {
-                "score": 0,
-                "tf": 0,
-                "idf": 0,
-            },
-            "finalScore": 0
+            "finalScore": 0.0,
+            "contributions": {
+                "string": [
+                    {
+                        "field": "Title",
+                        "fieldWeight": 1,
+                        "bM25": 0,
+                        "fuzzyBoost": 0,
+                        "final": 0                       
+                    }
+                ]
+            }
         }
     }]
 }
@@ -79,26 +85,28 @@ Example response with explanation:
 Search with own options:
 ```
 {
-    "query": "string",
-    "options": {
-        "limit": 0,
-        fuzzy: {
-            "maxeditdistance": 0,
-            "editdistancelimit": 0,
-            "prefixdistancelimit": 0
-        },
-        "score": {
-            "k": 0,
-            "b": 0,
-            "boost": {
-                "title": 0,
-                "description": 0,
-                "tags": 0
-            }
-        }
-    }
+  "query": "string",
+  "options": {
+    "limit": 10,
+    "fuzzy": {
+      "maxEditDistance": 2,
+      "maxPrefixEditDistance": 1,
+      "editDistanceLimit": 3
+    },
+    "score": {
+      "k": 1.75,
+      "b": 0.75,
+      "boost": {
+        "title": 3.0,
+        "description": 1.0,
+        "tags": 2.0
+      }
+    },
+    "explain": false
+  }
 }
 ```
+The shown values are default values.
 
 ### Engine Configuration
 - ```POST /engine/init```- Initializes the search engine with custom options (should be done before adding documents)
@@ -106,11 +114,17 @@ Search with own options:
 Initialize with own options:
 ```
 {
-    "stopwords": ["string"],
-    "ngramsize": 0
+  "nGramSize": 3,
+  "stopwordsSource": "Default",
+  "stopWords": [
+    "string"
+  ]
 }
 ```
-- TODO: ```GET /engine/status``` - Returns the status of the engine and additional information about the used structures (like index size or total number of documents)
+
+Default stopwords are included by default (`stopwordsSource: "Default"`). Additional words can be added alongside them (`"DefaultAndCustom"`), or the default list can be ignored entirely to use only custom stopwords (`"Custom"`).
+
+- ```GET /engine/status``` - Returns the status of the engine and additional information about the used structures (like index size or total number of documents)
 
 Example response:
 ```
@@ -118,8 +132,7 @@ Example response:
     "isRunning" = true,
     "startetAt" = 0,
     "totalDocuments": 0,
-    "totalTokens": 0,
-    "indexSize": 0
+    "totalTokens": 0
 }
 ```
 ### Health

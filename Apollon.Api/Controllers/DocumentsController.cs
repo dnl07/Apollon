@@ -60,7 +60,7 @@ namespace Apollon.Api.Controllers {
         }
 
  
-        [HttpPut("remove/{id:Guid}")]
+        [HttpDelete("remove/{id:Guid}")]
         public IActionResult Remove(Guid id) {
             _searchEngine.RemoveDocument(id);
             return Ok();

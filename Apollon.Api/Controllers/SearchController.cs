@@ -19,7 +19,7 @@ namespace Apollon.Api.Controllers {
         public ActionResult<SearchResponseDto> Search([FromQuery] string query, bool explain = false) {
             var watch = new Stopwatch();
             watch.Start();
-            SearchResult searchResult = _searchEngine.Search(query, explain, null);
+            SearchResult searchResult = _searchEngine.Search(query, explain, new QueryOptionsDto().ToEngineModel());
             watch.Stop();
             
             var searchResponse = searchResult.ToDto();
