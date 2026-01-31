@@ -13,45 +13,50 @@ namespace Apollon.Core.Fuzzy {
             _indexOptions = options;
         }
 
+        /// <summary>
+        /// Matches a given token to other token and returns all candidates
+        /// </summary>
         public IReadOnlyList<FuzzyToken> Match(string token, TokenRegistry tokenRegistry, QueryOptions queryOptions) {
-            var candidates = new Dictionary<string, int>();
+            // Dictionary to count how many n-Grams each candidate token shares with the input token
+            var candidateCounts = new Dictionary<string, int>();
 
+            // Generate n-Grams for the input token and find all possible candidates
             foreach (var nGram in NGramGenerator.Generate(token, _indexOptions.NGramSize)) {
                 foreach (var candidateId in _nGramIndex.GetCandidates(nGram)) {
-                    var candidate = tokenRegistry.GetToken(candidateId);
+                    var candidateToken = tokenRegistry.GetToken(candidateId);
 
-                    if (candidate == token) continue;
+                    if (candidateToken == token) continue;
 
-                    if (candidates.TryGetValue(candidate, out var count)) {
-                        candidates[candidate] = count + 1;
+                    if (candidateCounts.TryGetValue(candidateToken, out var count)) {
+                        candidateCounts[candidateToken] = count + 1;
                     } else {
-                        candidates[candidate] = 1;
+                        candidateCounts[candidateToken] = 1;
                     }
                 }
             }
 
-            List<FuzzyToken> tokens = new List<FuzzyToken>();
+            // Preselect candidates
+            List<string> preselectedTokens = new List<string>();
+            var inputNGrams = NGramGenerator.Generate(token, _indexOptions.NGramSize);
 
-            var cand = new List<string>();
-            foreach ((string key, int c) in candidates) {
-                var nGramsA = NGramGenerator.Generate(token, _indexOptions.NGramSize);
-                var nGramsB = NGramGenerator.Generate(key, _indexOptions.NGramSize);
+            foreach ((string candidateToken, int overlapCount) in candidateCounts) {
+                var candidateNGrams = NGramGenerator.Generate(candidateToken, _indexOptions.NGramSize);
 
-                if (c >= Math.Max(nGramsA.Count, nGramsB.Count) - _indexOptions.NGramSize * queryOptions.MaxEditDistance)
-                        {
-                            cand.Add(key);
-                        }
+                if (overlapCount >= Math.Max(inputNGrams.Count, candidateNGrams.Count) - _indexOptions.NGramSize * queryOptions.MaxEditDistance) {
+                    preselectedTokens.Add(candidateToken);
+                }
             }
 
-
-            foreach (var id in cand) {
-                var editDistance = EditDistance.Calculate(token, id);
+            // Calculate edit distance
+            List<FuzzyToken> fuzzyMatches = new List<FuzzyToken>();
+            foreach (var preselected in preselectedTokens) {
+                var editDistance = EditDistance.Calculate(token, preselected);
                 if (editDistance <= queryOptions.MaxEditDistance) {
-                    tokens.Add(new FuzzyToken(id, editDistance));
+                    fuzzyMatches.Add(new FuzzyToken(preselected, editDistance));
                 }    
             }
 
-            return tokens;
+            return fuzzyMatches;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Apollon.Core.Fuzzy {
                     .Match(term, tokenRegistry, options)
                     .OrderBy(f => f.EditDistance)
                     .Take(options.EditDistanceLimit)) {
-                    double boost = term == fuzzy.Token ? 10 : Math.Exp(-fuzzy.EditDistance);
+                    double boost = term == fuzzy.Token ? 5 : Math.Exp(-fuzzy.EditDistance);
                     expanded.Add((fuzzy.Token, boost));
                 }
             }
