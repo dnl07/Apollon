@@ -8,11 +8,17 @@
         public int Count => _tokenToId.Count;
 
         public string GetToken(int id) {
-            return _idToToken[id];
+            if (_idToToken.TryGetValue(id, out var token)) {
+                return token;
+            }
+            return "";
         }
 
         public int GetIdOfToken(string token) {
-            return _tokenToId[token];
+            if (_tokenToId.TryGetValue(token, out var id)) {
+                return id;
+            }
+            return -1;
         }
 
         /// <summary>
@@ -20,9 +26,8 @@
         /// </summary>
         /// <returns>The corresponding id of the token if successfully added, -1 otherwise.</returns>
         public int Add(string token) {
-            if (!_tokenToId.ContainsKey(token)) {
+            if (_tokenToId.TryAdd(token, _idCounter)) {
                 _idToToken.Add(_idCounter, token);
-                _tokenToId.Add(token, _idCounter);
                 _idCounter++;
 
                 return _idCounter - 1;

@@ -90,6 +90,8 @@ namespace Apollon.Core.Search {
             
             foreach (var token in doc.AllTokens) {
                 var tokenId = _tokens.GetIdOfToken(token);
+                if (tokenId == -1) continue;
+
                 _tokens.Remove(token);
                 _nGramIndex.RemoveToken(token, tokenId);
             }
