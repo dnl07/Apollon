@@ -11,9 +11,9 @@ namespace Apollon.Api.Mappers.Options {
                 MaxPrefixEditDistance = options.Fuzzy.MaxPrefixEditDistance,
                 BM25K = options.Score.K,
                 BM25B = options.Score.B,
-                TitleWeight = options.Score.boost.Title,
-                DescriptionWeight = options.Score.boost.Description,
-                TagWeight = options.Score.boost.Tags,
+                TitleWeight = options.Score.Boost.Title,
+                DescriptionWeight = options.Score.Boost.Description,
+                TagWeight = options.Score.Boost.Tags,
             };
         }
     }

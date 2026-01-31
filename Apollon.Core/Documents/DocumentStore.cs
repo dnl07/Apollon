@@ -5,7 +5,6 @@ using Apollon.Models.Indexing;
 namespace Apollon.Core.Documents {
     public class DocumentStore {
         private readonly Dictionary<Guid, SearchDocument> _docs = new();
-
         private readonly Dictionary<Field, long> _totalFieldLengths = new();
         private readonly Dictionary<Field, int> _docCountsPerField = new();
 
@@ -33,11 +32,6 @@ namespace Apollon.Core.Documents {
 
             _docs[doc.Id] = doc;
             UpdateAllFields(doc);
-        }
-
-        public void Update(SearchDocument newDoc) {
-            Remove(newDoc.Id);
-            Add(newDoc);
         }
 
         public void Remove(Guid id) {

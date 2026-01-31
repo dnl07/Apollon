@@ -114,14 +114,34 @@ namespace Apollon.Core.Search {
             // creates scores
             Dictionary<Guid, ScoreResult> scores = _scoring.ScoreDocuments(expanded, _invertedIndex, _docs, options, explain);
 
-            result.Hits = scores.
-                OrderByDescending(d => d.Value.FinalScore)
-                .Take(options.MaxDocs)
-                .Select(d => new SearchHit {
-                    Document = _docs.Get(d.Key),
-                    Explain = explain ? d.Value : null
-                })
-                .ToList();
+            // uses a min-heap to improve search performance
+            var topK = new PriorityQueue<KeyValuePair<Guid, ScoreResult>, double>();
+
+            foreach (var kv in scores) {
+                double score = kv.Value.FinalScore;
+                if (topK.Count < options.MaxDocs) {
+                    topK.Enqueue(kv, score);
+                } else if (score > topK.Peek().Value.FinalScore) {
+                    topK.Dequeue();
+                    topK.Enqueue(kv, score);
+                }
+            }
+
+            var topKHits = topK.UnorderedItems
+                .OrderByDescending(k => k.Priority)
+                .Select(s => s.Element);
+
+            foreach (var (id, scoreResult) in topKHits) {
+                var doc = _docs.Get(id);
+
+                if (doc == null) continue;
+
+                result.Hits.Add(new SearchHit {
+                    Document = doc,
+                    Explain = scoreResult
+                });
+            }
+
             // TODO: Better Take() performance
             return result;
         }
