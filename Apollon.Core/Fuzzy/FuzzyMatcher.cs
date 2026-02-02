@@ -20,8 +20,10 @@ namespace Apollon.Core.Fuzzy {
             // Dictionary to count how many n-Grams each candidate token shares with the input token
             var candidateCounts = new Dictionary<string, int>();
 
+            var inputNGrams = NGramGenerator.Generate(token, _indexOptions.NGramSize);
+
             // Generate n-Grams for the input token and find all possible candidates
-            foreach (var nGram in NGramGenerator.Generate(token, _indexOptions.NGramSize)) {
+            foreach (var nGram in inputNGrams) {
                 foreach (var candidateId in _nGramIndex.GetCandidates(nGram)) {
                     var candidateToken = tokenRegistry.GetToken(candidateId);
 
@@ -37,12 +39,11 @@ namespace Apollon.Core.Fuzzy {
 
             // Preselect candidates
             List<string> preselectedTokens = new List<string>();
-            var inputNGrams = NGramGenerator.Generate(token, _indexOptions.NGramSize);
 
             foreach ((string candidateToken, int overlapCount) in candidateCounts) {
-                var candidateNGrams = NGramGenerator.Generate(candidateToken, _indexOptions.NGramSize);
+                var candidateNGrams = _nGramIndex.GetNGrams(tokenRegistry.GetIdOfToken(candidateToken));
 
-                if (overlapCount >= Math.Max(inputNGrams.Count, candidateNGrams.Count) - _indexOptions.NGramSize * queryOptions.MaxEditDistance) {
+                if (overlapCount >= Math.Max(inputNGrams.Count, candidateNGrams.Length) - _indexOptions.NGramSize * queryOptions.MaxEditDistance) {
                     preselectedTokens.Add(candidateToken);
                 }
             }

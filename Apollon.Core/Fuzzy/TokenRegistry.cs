@@ -1,7 +1,11 @@
-﻿namespace Apollon.Core.Documents {
+﻿using Apollon.Core.Analysis;
+using Apollon.Core.Options;
+
+namespace Apollon.Core.Documents {
     public class TokenRegistry {
         private readonly Dictionary<int, string> _idToToken = new Dictionary<int, string>();
         private readonly Dictionary<string, int> _tokenToId = new Dictionary<string, int>();
+        private readonly Dictionary<string, string[]> _tokenToNGrams = new Dictionary<string, string[]>(); 
 
         private int _idCounter = 0;
 
@@ -39,6 +43,7 @@
             var tokenId = _tokenToId[token];
             _tokenToId.Remove(token);
             _idToToken.Remove(tokenId);
+            _tokenToNGrams.Remove(token);
         }
     }
 }

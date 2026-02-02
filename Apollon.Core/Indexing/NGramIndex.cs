@@ -2,7 +2,8 @@ using Apollon.Core.Analysis;
 
 namespace Apollon.Core.Indexing {
     public class NGramIndex {
-        private readonly Dictionary<string, HashSet<int>> _nGramIndex = new();
+        private readonly Dictionary<string, HashSet<int>> _nGramToToken = new();
+        private readonly Dictionary<int, string[]> _tokenToNGram = new();
 
         private int _nGramSize { get; }
 
@@ -11,27 +12,43 @@ namespace Apollon.Core.Indexing {
         }
 
         public void AddToken(string token, int id) {
-            foreach (var nGram in NGramGenerator.Generate(token, _nGramSize)) {
-                if (_nGramIndex.TryGetValue(nGram, out var tokenIds)) {
+            var nGrams = NGramGenerator.Generate(token, _nGramSize);
+
+            _tokenToNGram.TryAdd(id, nGrams.ToArray());
+
+            foreach (var nGram in nGrams) {
+                if (_nGramToToken.TryGetValue(nGram, out var tokenIds)) {
                     tokenIds.Add(id);
+
                 } else {
-                    _nGramIndex[nGram] = [id];
+                    _nGramToToken[nGram] = [id];
                 }
             }
         }
 
         public void RemoveToken(string token, int id) {
-            foreach (var nGram in NGramGenerator.Generate(token, _nGramSize)) {
-                if (_nGramIndex.TryGetValue(nGram, out var ids)) {
+            var nGrams = NGramGenerator.Generate(token, _nGramSize);
+
+            _tokenToNGram.Remove(id);
+
+            foreach (var nGram in nGrams) {
+                if (_nGramToToken.TryGetValue(nGram, out var ids)) {
                     ids.Remove(id);
-                    if (ids.Count == 0) _nGramIndex.Remove(nGram);
+                    if (ids.Count == 0) _nGramToToken.Remove(nGram);
                 }
             }
         }
 
         public HashSet<int> GetCandidates(string nGram) {
-            if (_nGramIndex.TryGetValue(nGram, out var candidates)) {  
+            if (_nGramToToken.TryGetValue(nGram, out var candidates)) {  
                 return candidates ?? []; 
+            }
+            return [];
+        }
+
+        public string[] GetNGrams(int tokenId) {
+            if (_tokenToNGram.TryGetValue(tokenId, out var nGrams)) {
+                return nGrams;
             }
             return [];
         }

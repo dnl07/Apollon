@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Apollon.Core.Analysis;
 using Apollon.Core.Documents;
 using Apollon.Core.Fuzzy;
@@ -113,6 +114,10 @@ namespace Apollon.Core.Search {
             // fuzzy string matching
             var expanded = _expander.Expand(request, _fuzzyMatcher, _tokens, options);
 
+            if (explain) {
+                result.MatchedTokens = expanded.Select(e => e.token).ToList();
+            }
+
             // creates scores
             Dictionary<Guid, ScoreResult> scores = _scoring.ScoreDocuments(expanded, _invertedIndex, _docs, options, explain);
 
@@ -144,7 +149,6 @@ namespace Apollon.Core.Search {
                 });
             }
 
-            // TODO: Better Take() performance
             return result;
         }
 

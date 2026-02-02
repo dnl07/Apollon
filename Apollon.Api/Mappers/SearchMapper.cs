@@ -27,6 +27,7 @@ namespace Apollon.Api.Mappers.Search {
             return new SearchResponseDto {
                 Query = result.Query,
                 Total = result.Hits.Count,
+                MatchedTokens = result.MatchedTokens,
                 Hits = hits.ToArray()
             };
         }
