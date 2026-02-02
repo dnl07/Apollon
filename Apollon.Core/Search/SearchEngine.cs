@@ -26,18 +26,14 @@ namespace Apollon.Core.Search {
         private bool _isRunning = false;
         private DateTime _startedAt;
 
+        private HashSet<string> _stopwords = new();
+
         public SearchEngine() {
             _isRunning = true;
             _startedAt = DateTime.Now;
         }
 
         public void Initialize(IndexOptions options) {
-            if (_initialized) {
-                throw new InvalidOperationException("SearchEngine is already initialized.");
-            }
-
-            // TODO: Change init multiple times before adding documents
-
             _options = options;
             _nGramIndex = new NGramIndex(_options.NGramSize);
             _fuzzyMatcher = new FuzzyMatcher(_nGramIndex, _options);
@@ -45,6 +41,7 @@ namespace Apollon.Core.Search {
             _scoring = new ScoringEngine();
 
             _initialized = true;
+            _stopwords = StopwordsProvider.ResolveStopwords(_options);
         }
 
         private void EnsureInitialized() {
@@ -61,9 +58,7 @@ namespace Apollon.Core.Search {
 
             doc.Id = Guid.NewGuid();
 
-            var stopwords = StopwordsProvider.ResolveStopwords(_options);
-
-            doc.Tokenize(stopwords);
+            doc.Tokenize(_stopwords);
 
             _docs.Add(doc);
             _invertedIndex.AddDocument(doc);
