@@ -28,8 +28,6 @@ namespace Apollon.Tests.CoreTests {
             index.AddDocument(doc1);
             index.AddDocument(doc2);
 
-            var titleTokens = index.GetSortedPostings("title");
-
             /*Assert.Collection(titleTokens, 
                 p => {
                     Assert.Equal(doc1.Id, p.DocumentId);
