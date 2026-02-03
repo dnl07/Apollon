@@ -67,16 +67,7 @@ namespace Apollon.Core.Documents {
         public int GetFieldLength(Guid id, Field field) {
             if (!_docs.TryGetValue(id, out var doc)) return 0;
 
-            string text = field switch {
-                Field.Title => doc.Title,
-                Field.Description => doc.Description,
-                Field.Tags => string.Join(" ", doc.Tags),
-                _ => "",
-            };
-
-            if (string.IsNullOrWhiteSpace(text)) return 0;
-
-            return Tokenizer.Tokenize(text).Length;
+            return doc.GetFieldTokens(field).Length;
         }
 
         /// <summary>

@@ -16,13 +16,20 @@ namespace Apollon.Core.Ranking {
             var scores = new Dictionary<Guid, ScoreResult>();
 
             foreach ((string term, double boost) in expanded) {
-                var postings = _invertedIndex.GetSortedPostings(term);
-                int df = postings.Count;
+                var posting = _invertedIndex.GetTokenPosting(term);
 
-                foreach (var posting in postings) {
-                    double bm25 = ComputeBM25Score(posting, df, docs, options);
+                if (posting == null) continue;
 
-                    double fieldWeight = posting.Field switch {
+                int df = posting.DocIds.Count;
+
+                for (int i = 0; i < posting.DocIds.Count; i++) {
+                    var docId = posting.DocIds[i];
+                    var field = FieldOrdinal.OrdinalToField(posting.Fields[i]);
+                    var tf = posting.Frequencies[i];
+
+                    double bm25 = ComputeBM25Score(docId, field, tf, df, docs, options);
+
+                    double fieldWeight = field switch {
                         Field.Title => options.TitleWeight,
                         Field.Description => options.DescriptionWeight,
                         Field.Tags => options.TagWeight,
@@ -31,9 +38,9 @@ namespace Apollon.Core.Ranking {
 
                     double finalScore = bm25 * boost * fieldWeight;
 
-                    if (!scores.TryGetValue(posting.DocumentId, out var score)) {
+                    if (!scores.TryGetValue(docId, out var score)) {
                         score = new ScoreResult();
-                        scores[posting.DocumentId] = score;
+                        scores[docId] = score;
                     }
 
                     score.FinalScore += finalScore;
@@ -45,7 +52,7 @@ namespace Apollon.Core.Ranking {
                         }
 
                         contributions.Add(new ScoreContribution {
-                           Field = posting.Field,
+                           Field = field,
                            BM25 = bm25,
                            FuzzyBoost = boost,
                            FieldWeight = fieldWeight,
@@ -60,9 +67,8 @@ namespace Apollon.Core.Ranking {
         /// <summary>
         /// Calculates the BM25-Score for a posting given all documents.
         /// </summary>
-        private static double ComputeBM25Score(Posting posting, int df, DocumentStore docs, QueryOptions options) {
+        private static double ComputeBM25Score(Guid docId, Field field, int tf, int df, DocumentStore docs, QueryOptions options) {
             int n = docs.Count;
-            var field = posting.Field;
 
             if (n <= 0 || df <= 0 || df > n) return 0.0;
 
@@ -70,8 +76,7 @@ namespace Apollon.Core.Ranking {
             double avdl = docs.GetAverageFieldLength(field);
             if (avdl <= 0) return 0.0;
 
-            var tf = posting.TermFrequency;
-            var dl = docs.GetFieldLength(posting.DocumentId, posting.Field);
+            var dl = docs.GetFieldLength(docId, field);
 
             double bm25 = BM25.ComputeScore(tf, df, n, dl, avdl, options.BM25K, options.BM25B);
             

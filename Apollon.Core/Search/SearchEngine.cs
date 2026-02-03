@@ -34,6 +34,10 @@ namespace Apollon.Core.Search {
         }
 
         public void Initialize(IndexOptions options) {
+            if (_initialized) {
+                throw new InvalidOperationException("SearchEngine is already initialized.");
+            }
+
             _options = options;
             _nGramIndex = new NGramIndex(_options.NGramSize);
             _fuzzyMatcher = new FuzzyMatcher(_nGramIndex, _options);
