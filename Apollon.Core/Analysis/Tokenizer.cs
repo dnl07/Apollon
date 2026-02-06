@@ -12,7 +12,7 @@ namespace Apollon.Core.Analysis {
             for (int i = 0; i <= span.Length; i++) {
                 if (i == span.Length || char.IsWhiteSpace(span[i])) {
                     if (i > start) {
-                        var token = ProcessToken(span[start..i]);
+                        var token = ProcessToken(span[start..i], stopWords);
                         if (!string.IsNullOrWhiteSpace(token)) {
                             tokens.Add(token);
                         }
