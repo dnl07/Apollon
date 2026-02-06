@@ -1,49 +1,51 @@
+using Microsoft.VisualBasic;
 using System.Globalization;
 using System.Text;
 
 namespace Apollon.Core.Analysis {
     public static class Normalizer {
-        public static string Normalize(string token) {
-            if (string.IsNullOrWhiteSpace(token)) return string.Empty;
+        public static string Normalize(ReadOnlySpan<char> token) {
+            if (token.IsEmpty) return string.Empty;
 
-            // Simplify unicode
-            token = token.Normalize(NormalizationForm.FormKC);
+            int start = 0;
+            int end = token.Length - 1;
 
-            // lower-case
-            token = token.ToLowerInvariant();
+            while (start <= end && IsPunctuation(token[start])) start++;
+            while (end >= start && IsPunctuation(token[end])) end--;
 
-            // Remove diacritics
-            token = RemoveDiacritics(token);
+            if (start > end) return string.Empty;
 
-            token = token.Trim(
-                '.', ',', ':', ';', '!', '?',
-                '(', ')', '[', ']', '{', '}',
-                '"', '\'', '�', '�', '�'
-            );
+            var sb = new StringBuilder(end - start + 1);
+            for (int i = start; i <= end; i++) {
+                char c = char.ToLowerInvariant(token[i]);
 
-            if (!token.Any(char.IsLetterOrDigit)) return string.Empty;
+                c = RemoveDiacritics(c);
 
-            return token;
+                if (char.IsLetterOrDigit(c)) sb.Append(c);
+            }
+
+            if (sb.Length == 0) return string.Empty;
+
+            return sb.ToString();
         }
+
+        private static bool IsPunctuation(char c) =>
+            c == '.' || c == ',' || c == ':' || c == ';' || c == '!' || c == '?' ||
+            c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}' ||
+            c == '"' || c == '\'' || c == '�' || c == '-' || c == '_';
 
         /// <summary>
         /// Removes diacritics from a given string.
         /// </summary>
-        private static string RemoveDiacritics(string token) {
-            var normalizedString = token.Normalize(NormalizationForm.FormD);
-            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
+        private static char RemoveDiacritics(char c) {
+            var normalizedString = c.ToString().Normalize(NormalizationForm.FormD);
 
-            for (int i = 0; i < normalizedString.Length; i++) {
-                char c = normalizedString[i];
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark) {
-                    stringBuilder.Append(c);
+            foreach (var ch in normalizedString) {
+                if (CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark) {
+                    return ch;
                 }
             }
-
-            return stringBuilder
-                .ToString()
-                .Normalize(NormalizationForm.FormC);
+            return c;
         }
     }
 }

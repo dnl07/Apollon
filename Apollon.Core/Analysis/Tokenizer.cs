@@ -1,27 +1,38 @@
+using System.Runtime.CompilerServices;
+
 namespace Apollon.Core.Analysis {
     public static class Tokenizer {
         public static string[] Tokenize(string text, HashSet<string>? stopWords = null) {
             if (string.IsNullOrWhiteSpace(text)) return Array.Empty<string>();
 
-            var rawTokens = text.Split(
-                [" ", "\n", "\r", "\t"],
-                StringSplitOptions.RemoveEmptyEntries
-            );
+            var tokens = new HashSet<string>();
 
-            var tokens = new List<string>();
-
-            foreach (var raw in rawTokens) {
-                var token = Normalizer.Normalize(raw);
-
-                if (string.IsNullOrWhiteSpace(token)) continue;
-
-                // Remove stopwords
-                if (stopWords != null && stopWords.Contains(token)) continue;
-
-                tokens.Add(token);
+            ReadOnlySpan<char> span = text.AsSpan();
+            int start = 0;
+            for (int i = 0; i <= span.Length; i++) {
+                if (i == span.Length || char.IsWhiteSpace(span[i])) {
+                    if (i > start) {
+                        var token = ProcessToken(span[start..i]);
+                        if (!string.IsNullOrWhiteSpace(token)) {
+                            tokens.Add(token);
+                        }
+                    }
+                    start = i + 1;
+                }
             }
 
             return tokens.ToArray();
         } 
+
+        private static string ProcessToken(ReadOnlySpan<char> text, HashSet<string>? stopWords = null) {
+            var token = Normalizer.Normalize(text);
+
+            if (string.IsNullOrWhiteSpace(token)) return "";
+
+            // Remove stopwords
+            if (stopWords != null && stopWords.Contains(token)) return "";
+
+            return token;
+        }
     }
 }
