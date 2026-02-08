@@ -5,12 +5,14 @@ namespace Apollon.Core.Analysis {
 
             string edgeSymbols = string.Join("", Enumerable.Repeat("$", nGramSize -1));
 
-            token = prefixEditDistance ?  $"{edgeSymbols}{token}" : $"{edgeSymbols}{token}{edgeSymbols}";
+            var paddedToken = prefixEditDistance ?  $"{edgeSymbols}{token}" : $"{edgeSymbols}{token}{edgeSymbols}";
 
-            List<string> nGrams = new List<string>();
+            List<string> nGrams = new List<string>(paddedToken.Length - nGramSize + 1);
 
-            for (int i = 0; i < token.Length - nGramSize + 1; i++) {
-                nGrams.Add(token.Substring(i, nGramSize));
+            ReadOnlySpan<char> span = paddedToken.AsSpan();
+
+            for (int i = 0; i < span.Length - nGramSize + 1; i++) {
+                nGrams.Add(span.Slice(i, nGramSize).ToString());
             }
 
             return nGrams;
