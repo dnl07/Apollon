@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Apollon.Core.Analysis;
 using Apollon.Core.Documents;
 using Apollon.Core.Fuzzy;

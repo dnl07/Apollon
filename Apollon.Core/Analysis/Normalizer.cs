@@ -1,15 +1,19 @@
-using Microsoft.VisualBasic;
 using System.Globalization;
 using System.Text;
 
 namespace Apollon.Core.Analysis {
     public static class Normalizer {
+        /// <summary>
+        /// Normalizes a token by trimming surrounding punctuation, converting to
+        /// lower-case and removing diacritics.
+        /// </summary>
         public static string Normalize(ReadOnlySpan<char> token) {
             if (token.IsEmpty) return string.Empty;
 
             int start = 0;
             int end = token.Length - 1;
 
+            // Trimming punctuation at the start and end
             while (start <= end && IsPunctuation(token[start])) start++;
             while (end >= start && IsPunctuation(token[end])) end--;
 
@@ -34,9 +38,6 @@ namespace Apollon.Core.Analysis {
             c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}' ||
             c == '"' || c == '\'' || c == '�' || c == '-' || c == '_';
 
-        /// <summary>
-        /// Removes diacritics from a given string.
-        /// </summary>
         private static char RemoveDiacritics(char c) {
             var normalizedString = c.ToString().Normalize(NormalizationForm.FormD);
 

@@ -1,9 +1,10 @@
-using System.Runtime.CompilerServices;
-
 namespace Apollon.Core.Analysis {
     public static class Tokenizer {
+        /// <summary>
+        /// Transforms a given text into normalized, by whitespace splitted tokens.
+        /// </summary>
         public static string[] Tokenize(string text, HashSet<string>? stopWords = null) {
-            if (string.IsNullOrWhiteSpace(text)) return Array.Empty<string>();
+            if (string.IsNullOrWhiteSpace(text)) return [];
 
             var tokens = new HashSet<string>();
 
@@ -24,6 +25,9 @@ namespace Apollon.Core.Analysis {
             return tokens.ToArray();
         } 
 
+        /// <summary>
+        /// Normalizes a token if it is not a stopword.
+        /// </summary>
         private static string ProcessToken(ReadOnlySpan<char> text, HashSet<string>? stopWords = null) {
             var token = Normalizer.Normalize(text);
 
