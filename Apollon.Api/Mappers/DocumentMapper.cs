@@ -13,6 +13,7 @@ namespace Apollon.Api.Mappers.Document {
         public static DocumentDto ToDto(this SearchDocument doc) {
             return new DocumentDto {
                 Id = doc.Id,
+                Title = doc.Title
             };
         }
     }

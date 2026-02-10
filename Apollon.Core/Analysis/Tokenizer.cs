@@ -6,7 +6,7 @@ namespace Apollon.Core.Analysis {
         public static string[] Tokenize(string text, HashSet<string>? stopWords = null) {
             if (string.IsNullOrWhiteSpace(text)) return [];
 
-            var tokens = new HashSet<string>();
+            var tokens = new List<string>();
 
             ReadOnlySpan<char> span = text.AsSpan();
             int start = 0;

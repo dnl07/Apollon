@@ -91,6 +91,8 @@ namespace Apollon.Core.Search {
                 var tokenId = _tokens.GetIdOfToken(token);
                 if (tokenId == -1) continue;
 
+                if (_invertedIndex.GetTokenPosting(token) != null) continue;
+
                 _tokens.Remove(token);
                 _nGramIndex.RemoveToken(token, tokenId);
             }

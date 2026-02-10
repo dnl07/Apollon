@@ -77,5 +77,9 @@ namespace Apollon.Core.Documents {
 
             return (double)_totalFieldLengths[field] / docCount;
         }
+
+        public int GetCount(Field field) {
+            return _docCountsPerField[field];
+        }
     }
 }
