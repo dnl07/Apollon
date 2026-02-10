@@ -24,11 +24,11 @@ Endpoints:
 - ```DELETE /documents/delete/{id}```- Deletes a document
 
 Document JSON structure:
-```
+```json
 {
-    "title": "string",
-    "description": "string",
-    "tags": ["string"]
+  "title": "string",
+  "description": "string",
+  "tags": ["string"]
 }
 ```
 
@@ -39,59 +39,59 @@ Endpoints:
 - ```POST /search``` . Search with custom options
 
 Example response:
-```
+```json
 {
-    "query": "string",
-    "total": 0,
-    "elapsedTime": 0,
-    "hits": [{
-        "id": 0,
-        "fields": {
-            "title": "string",
-            "description": "string",
-            "tags": ["string"]     
-        }
-    }]
+  "query": "string",
+  "total": 0,
+  "elapsedTime": 0,
+  "hits": [{
+    "id": 0,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "tags": ["string"]
+    }
+  }]
 }
 ```
 Example response with explanation:
-```
+```json
 {
-    ...
-    "hits": [{
-        "id": 0,
-        "fields": {
-            "title": "string",
-            "description": "string",
-            "tags": ["string"]     
-        },
-        "explain": {
-            "finalScore": 0.0,
-            "contributions": {
-                "string": [
-                    {
-                        "field": "Title",
-                        "fieldWeight": 1,
-                        "bM25": 0,
-                        "fuzzyBoost": 0,
-                        "final": 0                       
-                    }
-                ]
-            }
-        }
-    }]
+  ...
+  "hits": [{
+    "id": 0,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "tags": ["string"]
+    },
+    "explain": {
+      "finalScore": 0.0,
+      "contributions": {
+        "string": [
+          {
+            "field": "Title",
+            "fieldWeight": 1,
+            "bM25": 0,
+            "fuzzyBoost": 0,
+            "final": 0
+          }
+        ]
+      }
+    }
+  }]
 }
 ```
 Search with own options:
-```
+```json
 {
   "query": "string",
   "options": {
     "limit": 10,
     "fuzzy": {
       "maxEditDistance": 2,
-      "maxPrefixEditDistance": 1,
-      "editDistanceLimit": 3
+      "maxFuzzyExpansions": 5,
+      "exactMatchBoost": 5
     },
     "score": {
       "k": 1.75,
@@ -112,7 +112,7 @@ The shown values are default values.
 - ```POST /engine/init```- Initializes the search engine with custom options (should be done before adding documents)
 
 Initialize with own options:
-```
+```json
 {
   "nGramSize": 3,
   "stopwordsSource": "Default",
@@ -127,12 +127,12 @@ Default stopwords are included by default (`stopwordsSource: "Default"`). Additi
 - ```GET /engine/status``` - Returns the status of the engine and additional information about the used structures (like index size or total number of documents)
 
 Example response:
-```
+```json
 {
-    "isRunning" = true,
-    "startetAt" = 0,
-    "totalDocuments": 0,
-    "totalTokens": 0
+  "isRunning": true,
+  "startetAt": 0,
+  "totalDocuments": 0,
+  "totalTokens": 0
 }
 ```
 ### Health
