@@ -22,9 +22,9 @@ namespace Apollon.Core.Analysis {
         private static HashSet<string> Load() {
             using var stream = typeof(StopwordsProvider)
                 .Assembly
-                .GetManifestResourceStream("Apollon.Core.Resources.stopwords_en.tsv");
+                .GetManifestResourceStream("Apollon.Core.Data.stopwords_en.tsv");
 
-            if (stream == null) return [];
+            if (stream == null) throw new Exception("File containing stopwords not found");
 
             using var reader = new StreamReader(stream);
 

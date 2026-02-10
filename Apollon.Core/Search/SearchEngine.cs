@@ -110,7 +110,7 @@ namespace Apollon.Core.Search {
             result.Query = request;
 
             // fuzzy string matching
-            var expanded = _expander.Expand(request, _fuzzyMatcher, _tokens, options);
+            var expanded = _expander.Expand(request, _fuzzyMatcher, _tokens, _stopwords, options);
 
             if (explain) {
                 result.MatchedTokens = expanded.Select(e => e.token).ToList();

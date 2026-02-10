@@ -8,10 +8,11 @@ namespace Apollon.Core.Fuzzy {
             string request,
             FuzzyMatcher fuzzyMatcher,
             TokenRegistry tokenRegistry,
+            HashSet<string> stopwords,
             QueryOptions options) {
             var expanded = new List<(string term, double boost)>();
 
-            foreach (string term in Tokenizer.Tokenize(request)) {
+            foreach (string term in Tokenizer.Tokenize(request, stopwords)) {
                 expanded.Add((term, 1.0));
 
                 foreach (var fuzzy in fuzzyMatcher
