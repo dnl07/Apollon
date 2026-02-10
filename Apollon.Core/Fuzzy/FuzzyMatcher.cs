@@ -43,12 +43,12 @@ namespace Apollon.Core.Fuzzy {
             foreach ((string candidateToken, int overlapCount) in candidateCounts) {
                 var candidateNGrams = _nGramIndex.GetNGrams(tokenRegistry.GetIdOfToken(candidateToken));
 
-                if (overlapCount >= Math.Max(inputNGrams.Count, candidateNGrams.Length) - _indexOptions.NGramSize * queryOptions.MaxEditDistance) {
+                if (overlapCount >= Math.Max(inputNGrams.Length, candidateNGrams.Length) - _indexOptions.NGramSize * queryOptions.MaxEditDistance) {
                     preselectedTokens.Add(candidateToken);
                 }
             }
 
-            // Calculate edit distance
+            // Calculate actual edit distance
             List<FuzzyToken> fuzzyMatches = new List<FuzzyToken>();
             foreach (var preselected in preselectedTokens) {
                 var editDistance = EditDistance.Calculate(token, preselected);

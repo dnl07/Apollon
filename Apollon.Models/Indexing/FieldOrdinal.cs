@@ -2,8 +2,8 @@ namespace Apollon.Models.Indexing {
     public static class FieldOrdinal {
         public static Field OrdinalToField(short ord) => ord switch {
             0 => Field.Title,
-            1 => Field.Title,
-            2 => Field.Title,
+            1 => Field.Description,
+            2 => Field.Tags,
             _ => throw new ArgumentOutOfRangeException(nameof(ord))
         };
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using Apollon.Core.Analysis;
 using Apollon.Models.Indexing;
 
 namespace Apollon.Core.Documents {

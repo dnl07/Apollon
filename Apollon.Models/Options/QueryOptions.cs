@@ -4,8 +4,8 @@ namespace Apollon.Core.Options {
 
         // Fuzzy search
         public int MaxEditDistance { get; set; } = 2;
-        public int MaxPrefixEditDistance { get; set; } = 1;
-        public int EditDistanceLimit { get; set; } = 3;
+        public int MaxFuzzyExpansions { get; set; } = 5;
+        public float ExactMatchBoost { get; set; } = 5;
 
         // Scoring
         public double BM25K { get; set; } = 1.75;

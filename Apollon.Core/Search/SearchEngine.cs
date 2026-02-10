@@ -70,7 +70,7 @@ namespace Apollon.Core.Search {
 
             foreach (string token in allTokens) {
                 var id = _tokens.Add(token);
-
+    
                 if (id != -1) {
                     _nGramIndex.AddToken(token, id);
                 }
@@ -143,7 +143,7 @@ namespace Apollon.Core.Search {
 
                 result.Hits.Add(new SearchHit {
                     Document = doc,
-                    Explain = scoreResult
+                    Explain = explain ? scoreResult : null
                 });
             }
 

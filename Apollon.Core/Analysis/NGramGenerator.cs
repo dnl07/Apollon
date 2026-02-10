@@ -3,7 +3,7 @@ namespace Apollon.Core.Analysis {
         /// <summary>
         /// Generates a list of n-grams for a given token.
         /// </summary>
-        public static IReadOnlyList<string> Generate(string token, int nGramSize, bool prefixEditDistance = false) {
+        public static string[] Generate(string token, int nGramSize, bool prefixEditDistance = false) {
             if(string.IsNullOrWhiteSpace(token)) return [];
 
             // Creates edge symbols used for padding to find proper candidates
@@ -19,7 +19,7 @@ namespace Apollon.Core.Analysis {
                 nGrams.Add(span.Slice(i, nGramSize).ToString());
             }
 
-            return nGrams;
+            return nGrams.ToArray();
         } 
     }
 }

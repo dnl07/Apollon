@@ -15,7 +15,7 @@ namespace Apollon.Api.Mappers.Search {
                         Tags = hit.Document.Tags
                     },
                 };
-                if (hit.Explain != null) {
+                if (hit.Explain is not null) {
                     hitDto.Explain = new SearchExplainDto {
                         FinalScore = hit.Explain.FinalScore,
                         Contributions = hit.Explain.Contributions

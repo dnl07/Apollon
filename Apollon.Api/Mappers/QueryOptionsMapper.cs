@@ -6,9 +6,9 @@ namespace Apollon.Api.Mappers.Options {
         public static QueryOptions ToEngineModel(this QueryOptionsDto options) {
             return new QueryOptions {
                 MaxDocs = options.Limit,
-                MaxEditDistance = options.Fuzzy.EditDistanceLimit,
-                EditDistanceLimit = options.Fuzzy.EditDistanceLimit,
-                MaxPrefixEditDistance = options.Fuzzy.MaxPrefixEditDistance,
+                MaxEditDistance = options.Fuzzy.MaxEditDistance,
+                MaxFuzzyExpansions = options.Fuzzy.MaxFuzzyExpansions,
+                ExactMatchBoost = options.Fuzzy.ExactMatchBoost,
                 BM25K = options.Score.K,
                 BM25B = options.Score.B,
                 TitleWeight = options.Score.Boost.Title,
