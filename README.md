@@ -36,7 +36,7 @@ Document JSON structure:
 Endpoints:
 - ```GET /search?q=...``` - Simple search
 - ```GET /search?q=...&explain=true``` - Simple search with explanation
-- ```POST /search``` . Search with custom options
+- ```POST /search``` - Search with custom options
 
 Example response:
 ```json
@@ -132,7 +132,8 @@ Example response:
   "isRunning": true,
   "startetAt": 0,
   "totalDocuments": 0,
-  "totalTokens": 0
+  "totalTokens": 0,
+  "totalNGrams": 0
 }
 ```
 ### Health

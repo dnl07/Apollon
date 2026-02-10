@@ -160,7 +160,7 @@ namespace Apollon.Core.Search {
                 StartetAt = _startedAt,
                 TotalDocuments = _docs.Count,
                 TotalTokens = _tokens.Count,
-                IndexSize = _invertedIndex.Count
+                TotalNGrams = _nGramIndex.Count
             };
         }
     }

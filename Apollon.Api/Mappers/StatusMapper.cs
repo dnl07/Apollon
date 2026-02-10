@@ -9,7 +9,7 @@ namespace Apollon.Api.Mappers.Status {
                 StartetAt = status.StartetAt,
                 TotalDocuments = status.TotalDocuments,
                 TotalTokens = status.TotalTokens,
-                IndexSize = status.IndexSize
+                TotalNGrams = status.TotalNGrams
             };
         }
     }

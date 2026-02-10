@@ -7,6 +7,8 @@ namespace Apollon.Core.Indexing {
 
         private int _nGramSize { get; }
 
+         public int Count => _nGramToToken.Count;
+
         public NGramIndex(int nGramSize) {
             _nGramSize= nGramSize;
         }
