@@ -10,9 +10,9 @@ namespace Apollon.Core.Ranking {
         /// <param name="avdl">The average document length of all documents.</param>
         public static double ComputeScore(int tf, int df, int n, int dl, double avdl, double k, double b) {
             // Inverse document frequency
-            double idf = Math.Log2(n / df);
+            double idf = Math.Log2((double)n / df);
 
-            double a = 1 - b + b + dl / avdl;            
+            double a = 1 - b + b * dl / avdl;            
             return tf * (k + 1) * idf / (k * a + tf);
         }
     }

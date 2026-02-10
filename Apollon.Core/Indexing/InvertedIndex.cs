@@ -26,7 +26,7 @@ namespace Apollon.Core.Indexing {
                 if (!localCounts.TryGetValue(token, out var count)) {
                     localCounts[token] = 1;
                 } else {
-                    localCounts[token] = count++;
+                    localCounts[token] = count + 1;
                 }
             }
 

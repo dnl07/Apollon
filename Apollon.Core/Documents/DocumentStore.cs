@@ -37,7 +37,7 @@ namespace Apollon.Core.Documents {
 
             RemoveFieldLengths(doc.TitleTokens, Field.Title);
             RemoveFieldLengths(doc.DescriptionTokens, Field.Description);
-            RemoveFieldLengths(doc.Tags, Field.Tags);
+            RemoveFieldLengths(doc.TagsTokens, Field.Tags);
 
             _docs.Remove(id);
         }
