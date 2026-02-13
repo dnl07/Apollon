@@ -16,10 +16,10 @@ namespace Apollon.Api.Controllers {
         }
 
         [HttpGet]
-        public ActionResult<SearchResponseDto> Search([FromQuery] string query, bool explain = false) {
+        public ActionResult<SearchResponseDto> Search([FromQuery] string query, [FromQuery] int? limit, [FromQuery] bool explain = false) {
             var watch = new Stopwatch();
             watch.Start();
-            SearchResult searchResult = _searchEngine.Search(query, explain, new QueryOptionsDto().ToEngineModel());
+            SearchResult searchResult = _searchEngine.Search(query, explain, new QueryOptionsDto() { Limit = limit ?? 10 }.ToEngineModel());
             watch.Stop();
             
             var searchResponse = searchResult.ToDto();
