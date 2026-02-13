@@ -21,4 +21,13 @@
     <ProjectReference Include="..\Apollon.Models\Apollon.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+  <None Update="documents.json">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+  <None Update="TestDocuments\documents.json">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+
 </Project>
