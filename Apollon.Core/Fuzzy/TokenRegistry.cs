@@ -1,7 +1,4 @@
-﻿using Apollon.Core.Analysis;
-using Apollon.Core.Options;
-
-namespace Apollon.Core.Documents {
+﻿namespace Apollon.Core.Documents {
     public class TokenRegistry {
         private readonly Dictionary<int, string> _idToToken = new Dictionary<int, string>();
         private readonly Dictionary<string, int> _tokenToId = new Dictionary<string, int>();

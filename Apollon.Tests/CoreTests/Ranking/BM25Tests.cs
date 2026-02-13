@@ -1,5 +1,4 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 using Apollon.Core.Ranking;
 
 namespace Apollon.Tests.CoreTests.Ranking {

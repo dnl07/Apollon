@@ -1,5 +1,3 @@
-using Apollon.Core.Documents;
-
 namespace Apollon.Models.Search {
     public class SearchStatus {
         public bool IsRunning { get; set; } = false;
