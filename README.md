@@ -1,8 +1,8 @@
-# Apollon
+# SearchEngine
 
-## What is Apollon?
+## What is this engine for?
 
-Apollon (named after the Greek god of prophecy) is a lightweight, fast and ease-to-use search engine that can be run as an HTTP service and intergrated into your own applications.
+This engine is a lightweight, fast and ease-to-use search engine that can be run as an HTTP service and intergrated into your own applications.
 
 It provides simple document ranking based on relevance and supports approximate string matching (fuzzy search), making it well-suited for small to medium-sized projects that need flexible and efficient full-text search without heavy dependencies.
 
